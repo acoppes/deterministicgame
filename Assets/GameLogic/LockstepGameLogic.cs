@@ -17,6 +17,8 @@ public class LockstepGameLogic : DeterministicGameLogic
 		}
 		set {
 			_gameFramesPerLockstep = value;
+			if (_gameFrameForLockstep >= _gameFramesPerLockstep)
+				_gameFrameForLockstep = _gameFramesPerLockstep - 1;
 		}
 	}
 

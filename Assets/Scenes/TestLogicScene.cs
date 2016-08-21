@@ -4,19 +4,20 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 
 	public class MoveCommand : Command
 	{
-		GameObject gameObject;
-		int direction;
+		Unit unit;
+		Vector2 destination;
 
-		public MoveCommand(GameObject gameObject, int direction)
+		public MoveCommand(Unit unit, Vector2 destination)
 		{
-			this.gameObject = gameObject;
-			this.direction = direction;
+			this.unit = unit;
+			this.destination = destination;
 		}
 
 		public override void Process ()
 		{
 			base.Process ();
-			gameObject.transform.position = gameObject.transform.position + new Vector3 (1 * direction, 0, 0);
+			unit.MoveTo (destination);
+//			gameObject.transform.position = gameObject.transform.position + new Vector3 (1 * direction, 0, 0);
 		}
 	}
 
@@ -26,10 +27,12 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 
 	CommandsList commandList = new CommandsList();
 
-	public GameObject testObject;
+	public Unit unit;
 
 	public int fixedTimestepMilliseconds = 100;
 	public int framesPerLockstep = 5;
+
+	public Camera camera;
 
 	void Awake()
 	{
@@ -53,11 +56,20 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		int milliseconds = Mathf.RoundToInt(Time.deltaTime * 1000.0f);
 		gameFixedUpdate.Update (milliseconds);
 
-		if (Input.GetKeyUp (KeyCode.LeftArrow)) {
-			commandList.AddCommand (new MoveCommand (testObject, -1));
-		} else if (Input.GetKeyUp (KeyCode.RightArrow)) {
-			commandList.AddCommand (new MoveCommand (testObject, 1));
+
+
+		if (Input.GetMouseButtonUp (1)) {
+		
+			Vector2 position = camera.ScreenToWorldPoint(Input.mousePosition);
+
+			commandList.AddCommand (new MoveCommand (unit, position));
 		}
+
+//		if (Input.GetKeyUp (KeyCode.LeftArrow)) {
+//			commandList.AddCommand (new MoveCommand (unit, -1));
+//		} else if (Input.GetKeyUp (KeyCode.RightArrow)) {
+//			commandList.AddCommand (new MoveCommand (unit, 1));
+//		}
 
 		commandList.IsReady = true;
 	}
@@ -67,6 +79,7 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 	public void Update (int dt, int frame)
 	{
 		Debug.Log ("Timestep: " + frame);
+		unit.GameUpdate (dt, frame);
 	}
 
 	#endregion
