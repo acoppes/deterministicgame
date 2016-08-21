@@ -70,7 +70,7 @@ public class TestGameStep {
 	[Test]
 	public void TestLockstepImplementation()
 	{
-		LockstepGameLogic lockstepImplementation = new LockstepGameLogic ();
+		IntervalDeterministicGameLogic lockstepImplementation = new IntervalDeterministicGameLogic ();
 
 		lockstepImplementation.GameFramesPerLockstepFrame = 2;
 
@@ -95,7 +95,7 @@ public class TestGameStep {
 	[Test]
 	public void TestLockstepImplementation2()
 	{
-		LockstepGameLogic lockstepImplementation = new LockstepGameLogic ();
+		IntervalDeterministicGameLogic lockstepImplementation = new IntervalDeterministicGameLogic ();
 
 		lockstepImplementation.GameFramesPerLockstepFrame = 2;
 
@@ -110,7 +110,6 @@ public class TestGameStep {
 		lockstepImplementation.Update (10, 3);
 
 		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (2));
-
 	}
 
 }
