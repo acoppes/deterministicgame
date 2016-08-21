@@ -1,0 +1,50 @@
+# =============== #
+# Unity generated #
+# =============== #
+Temp/
+Obj/
+UnityGenerated/
+Library/
+
+# ===================================== #
+# 2dtoolkit generated #
+# ===================================== #
+Assets/-tk2d.asset
+Assets/-tk2d.asset.meta
+Assets/Resources/tk2d/*
+ 
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+ 
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+server/store
+data-processor/*
+data-processor/.idea/
+
+data-session-*
+pool-manager-*.csv
+
+UnsafeCode/UnsafeCode/Properties/
+UnsafeCode/UnsafeCode/bin/
+UnsafeCode/UnsafeCode/lib/
