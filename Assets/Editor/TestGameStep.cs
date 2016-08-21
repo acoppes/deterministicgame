@@ -1,37 +1,116 @@
 ﻿using NUnit.Framework;
+using System;
 
 public class TestGameStep {
+
+	public class GameStepEngineMock : DeterministicGameLogic
+	{
+		public int lastDt;
+		public int lastFrame;
+
+		#region GameStepEngine implementation
+		public void Update (int dt, int frame)
+		{
+			lastDt = dt;
+			lastFrame = frame;
+		}
+		#endregion
+	}
 
 	[Test]
 	public void TestFixedGameStepTwoUpdates()
 	{
-		GameStepCode gameStepCode = new GameStepCode ();
+		GameFixedUpdate gameFixedUpdate = new GameFixedUpdate ();
 
-		gameStepCode.FixedTimeStepMilliseconds = 50;
+		gameFixedUpdate.FixedTimeStepMilliseconds = 50;
 
-		gameStepCode.Init ();
+		gameFixedUpdate.Init ();
 
-		gameStepCode.Update (10);
+		gameFixedUpdate.Update (10);
 
-		Assert.That (gameStepCode.CurrentUpdate, Is.EqualTo (0));
+		Assert.That (gameFixedUpdate.CurrentGameFrame, Is.EqualTo (0));
 
-		gameStepCode.Update (40);
+		gameFixedUpdate.Update (40);
 
-		Assert.That (gameStepCode.CurrentUpdate, Is.EqualTo (1));
+		Assert.That (gameFixedUpdate.CurrentGameFrame, Is.EqualTo (1));
 	}
 
 	[Test]
 	public void TestFixedGameStepGreaterThanFixedTime()
 	{
-		GameStepCode gameStepCode = new GameStepCode ();
+		GameFixedUpdate gameFixedUpdate = new GameFixedUpdate ();
 
-		gameStepCode.FixedTimeStepMilliseconds = 50;
+		gameFixedUpdate.FixedTimeStepMilliseconds = 50;
 
-		gameStepCode.Init ();
+		gameFixedUpdate.Init ();
 
-		gameStepCode.Update (51);
+		gameFixedUpdate.Update (51);
 
-		Assert.That (gameStepCode.CurrentUpdate, Is.EqualTo (1));
+		Assert.That (gameFixedUpdate.CurrentGameFrame, Is.EqualTo (1));
+	}
+
+	[Test]
+	public void TestFixedGameStepEngineCalled()
+	{
+		GameFixedUpdate gameFixedUpdate = new GameFixedUpdate ();
+		GameStepEngineMock gameStepEngine = new GameStepEngineMock ();
+
+		gameFixedUpdate.SetGameLogic (gameStepEngine);
+
+		gameFixedUpdate.FixedTimeStepMilliseconds = 50;
+
+		gameFixedUpdate.Init ();
+
+		gameFixedUpdate.Update (78);
+
+		Assert.That (gameStepEngine.lastDt, Is.EqualTo (50));
+		Assert.That (gameStepEngine.lastFrame, Is.EqualTo (0));
+	}
+
+	[Test]
+	public void TestLockstepImplementation()
+	{
+		LockstepGameLogic lockstepImplementation = new LockstepGameLogic ();
+
+		lockstepImplementation.GameFramesPerLockstepFrame = 2;
+
+		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (0));
+
+		lockstepImplementation.Update (10, 0);
+
+		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (0));
+
+		try {
+		lockstepImplementation.Update (10, 2);
+		} catch {
+			Assert.Pass ();
+			return;
+		}
+
+		Assert.Fail ();
+
+		// Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (1));
+	}
+
+	[Test]
+	public void TestLockstepImplementation2()
+	{
+		LockstepGameLogic lockstepImplementation = new LockstepGameLogic ();
+
+		lockstepImplementation.GameFramesPerLockstepFrame = 2;
+
+		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (0));
+
+		lockstepImplementation.Update (10, 0);
+		lockstepImplementation.Update (10, 1);
+
+		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (1));
+
+		lockstepImplementation.Update (10, 2);
+		lockstepImplementation.Update (10, 3);
+
+		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (2));
+
 	}
 
 }
