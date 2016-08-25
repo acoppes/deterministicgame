@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 
 public class LockstepGameLogic : DeterministicGameLogic
 {
@@ -30,7 +29,7 @@ public class LockstepGameLogic : DeterministicGameLogic
 
 	#region DeterministicGameLogic implementation
 
-	public void Update (int dt, int frame)
+	public void Update (float dt, int frame)
 	{
 		if (!ProcessLockstepTurn ())
 			return;

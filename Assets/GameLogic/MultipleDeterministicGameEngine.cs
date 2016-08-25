@@ -8,7 +8,7 @@ public class MultipleDeterministicGameEngine : DeterministicGameLogic
 	}
 
 	#region DeterministicGameEngine implementation
-	public void Update (int dt, int frame)
+	public void Update (float dt, int frame)
 	{
 		for (int i = 0; i < gameEngines.Length; i++) {
 			var gameEngine = gameEngines [i];

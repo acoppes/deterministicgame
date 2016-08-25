@@ -1,20 +1,20 @@
 ﻿
 public class GameFixedUpdate {
 
-	int _fixedTimeStepMilliseconds = 50;
+	float _fixedStepTime = 0.05f;
 
 	int _currentGameFrame;
 
-	int _accumulatedMilliseconds;
+	float _accumulatedTime;
 
 	DeterministicGameLogic _deterministicGameLogic;
 
-	public int FixedTimeStepMilliseconds {
+	public float FixedStepTime {
 		get {
-			return _fixedTimeStepMilliseconds;
+			return _fixedStepTime;
 		}
 		set {
-			_fixedTimeStepMilliseconds = value;
+			_fixedStepTime = value;
 		}
 	}
 
@@ -32,18 +32,18 @@ public class GameFixedUpdate {
 	public void Init()
 	{
 		_currentGameFrame = 0;
-		_accumulatedMilliseconds = 0;
+		_accumulatedTime = 0;
 	}
 
-	public void Update(int milliseconds)
+	public void Update(float dt)
 	{
-		_accumulatedMilliseconds += milliseconds;
+		_accumulatedTime += dt;
 
-		while (_accumulatedMilliseconds >= _fixedTimeStepMilliseconds) {
+		while (_accumulatedTime >= _fixedStepTime) {
 			if (_deterministicGameLogic != null)
-				_deterministicGameLogic.Update (_fixedTimeStepMilliseconds, _currentGameFrame);
+				_deterministicGameLogic.Update (_fixedStepTime, _currentGameFrame);
 			_currentGameFrame++;
-			_accumulatedMilliseconds -= _fixedTimeStepMilliseconds;
+			_accumulatedTime -= _fixedStepTime;
 		}
 	}
 }

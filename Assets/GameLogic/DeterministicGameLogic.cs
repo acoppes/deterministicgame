@@ -1,4 +1,4 @@
 public interface DeterministicGameLogic
 {
-	void Update (int dt, int frame);
+	void Update (float dt, int frame);
 }

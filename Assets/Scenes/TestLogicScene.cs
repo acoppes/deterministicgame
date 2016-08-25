@@ -30,17 +30,17 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 	public Unit unit;
 
 	public int fixedTimestepMilliseconds = 100;
-	public int framesPerLockstep = 5;
+	public int lockstepMilliseconds = 500;
 
 	public Camera camera;
 
 	void Awake()
 	{
 		lockstepGameLogic = new LockstepGameLogic (this, commandList);
-		lockstepGameLogic.GameFramesPerLockstep = framesPerLockstep;
+		lockstepGameLogic.GameFramesPerLockstep = (lockstepMilliseconds / fixedTimestepMilliseconds);
 
 		gameFixedUpdate = new GameFixedUpdate ();
-		gameFixedUpdate.FixedTimeStepMilliseconds = fixedTimestepMilliseconds;
+		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
 		gameFixedUpdate.Init ();
 		gameFixedUpdate.SetGameLogic (lockstepGameLogic);
@@ -50,11 +50,11 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 	void Update () {
 
 		// update values
-		lockstepGameLogic.GameFramesPerLockstep = framesPerLockstep;
-		gameFixedUpdate.FixedTimeStepMilliseconds = fixedTimestepMilliseconds;
+		lockstepGameLogic.GameFramesPerLockstep = (lockstepMilliseconds / fixedTimestepMilliseconds);
+		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
-		int milliseconds = Mathf.RoundToInt(Time.deltaTime * 1000.0f);
-		gameFixedUpdate.Update (milliseconds);
+//		int milliseconds = Mathf.RoundToInt(Time.deltaTime * 1000.0f);
+		gameFixedUpdate.Update (Time.deltaTime);
 
 
 
@@ -76,7 +76,7 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 
 	#region DeterministicGameLogic implementation
 
-	public void Update (int dt, int frame)
+	public void Update (float dt, int frame)
 	{
 		Debug.Log ("Timestep: " + frame);
 		unit.GameUpdate (dt, frame);

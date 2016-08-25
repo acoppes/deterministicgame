@@ -27,7 +27,7 @@ public class IntervalDeterministicGameLogic : DeterministicGameLogic
 
 	#region GameStepEngine implementation
 
-	public void Update (int dt, int frame)
+	public void Update (float dt, int frame)
 	{
 		if (_lastGameFrame != frame - 1)
 			throw new Exception ();
