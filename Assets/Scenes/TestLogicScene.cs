@@ -105,6 +105,8 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		// debug...
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
+
+		Application.targetFrameRate = 60;
 	}
 
 	void ResetGameState()
