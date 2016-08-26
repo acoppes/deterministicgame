@@ -9,7 +9,7 @@ public class GameFixedUpdate {
 
 	float _gameTime;
 
-	DeterministicGameLogic _deterministicGameLogic;
+	GameLogic _gameLogic;
 
 	public float FixedStepTime {
 		get {
@@ -33,9 +33,9 @@ public class GameFixedUpdate {
 		}
 	}
 
-	public void SetGameLogic(DeterministicGameLogic deterministicGameLogic)
+	public void SetGameLogic(GameLogic gameLogic)
 	{
-		_deterministicGameLogic = deterministicGameLogic;
+		_gameLogic = gameLogic;
 	}
 
 	public void Init()
@@ -51,8 +51,8 @@ public class GameFixedUpdate {
 		_gameTime += dt;
 
 		while (_accumulatedTime >= _fixedStepTime) {
-			if (_deterministicGameLogic != null)
-				_deterministicGameLogic.Update (_fixedStepTime, _currentGameFrame);
+			if (_gameLogic != null)
+				_gameLogic.Update (_fixedStepTime, _currentGameFrame);
 			_currentGameFrame++;
 			_accumulatedTime -= _fixedStepTime;
 		}

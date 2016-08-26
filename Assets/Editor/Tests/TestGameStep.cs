@@ -2,7 +2,7 @@
 
 public class TestGameStep {
 
-	public class GameStepEngineMock : DeterministicGameLogic
+	public class GameStepEngineMock : GameLogic
 	{
 		public float lastDt;
 		public int lastFrame;

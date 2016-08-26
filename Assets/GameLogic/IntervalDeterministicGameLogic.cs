@@ -1,6 +1,6 @@
 using System;
 
-public class IntervalDeterministicGameLogic : DeterministicGameLogic
+public class IntervalDeterministicGameLogic : GameLogic
 {
 	int _gameFramesPerLockstepFrame = 4;
 

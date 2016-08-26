@@ -1,7 +1,7 @@
 
-public class LockstepGameLogic : DeterministicGameLogic
+public class LockstepGameLogic : GameLogic
 {
-	DeterministicGameLogic _gameLogic;
+	GameLogic _gameLogic;
 
 	readonly CommandsList _pendingCommands;
 
@@ -21,7 +21,7 @@ public class LockstepGameLogic : DeterministicGameLogic
 		}
 	}
 
-	public LockstepGameLogic(DeterministicGameLogic gameLogic, CommandsList pendingCommands)
+	public LockstepGameLogic(GameLogic gameLogic, CommandsList pendingCommands)
 	{
 		_gameLogic = gameLogic;
 		_pendingCommands = pendingCommands;

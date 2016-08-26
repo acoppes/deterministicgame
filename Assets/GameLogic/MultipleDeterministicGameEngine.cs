@@ -1,8 +1,8 @@
-public class MultipleDeterministicGameEngine : DeterministicGameLogic
+public class MultipleDeterministicGameEngine : GameLogic
 {
-	readonly DeterministicGameLogic[] gameEngines;
+	readonly GameLogic[] gameEngines;
 
-	public MultipleDeterministicGameEngine(DeterministicGameLogic[] gameEngines)
+	public MultipleDeterministicGameEngine(GameLogic[] gameEngines)
 	{
 		this.gameEngines = gameEngines;
 	}

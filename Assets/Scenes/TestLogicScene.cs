@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
+public class TestLogicScene : MonoBehaviour, GameLogic {
 
 	public class RecordedCommand
 	{
