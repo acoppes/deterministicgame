@@ -14,6 +14,8 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 	{
 		readonly List<RecordedCommand> recordedCommandsQueue = new List<RecordedCommand>();
 
+		public int lastGameFrame;
+
 		public void AddCommand(float gameTime, int gameFrame, Command command)
 		{
 			recordedCommandsQueue.Add (new RecordedCommand () { 
@@ -23,22 +25,24 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 			});
 		}
 
-		public RecordedCommand GetFirstCommand()
+		public void GetCommandsForFrame(int frame, List<Command> commands)
 		{
-			if (recordedCommandsQueue.Count == 0)
-				return null;
-			return recordedCommandsQueue[0];
+			for (int i = 0; i < recordedCommandsQueue.Count; i++) {
+				var recordedCommand = recordedCommandsQueue [i];
+				if (recordedCommand.gameFrame == frame)
+					commands.Add (recordedCommand.command);
+			}
 		}
 
-		public void RemoveCommand(RecordedCommand recordedCommand)
-		{
-			recordedCommandsQueue.Remove (recordedCommand);
-		}
+//		public void RemoveCommand(RecordedCommand recordedCommand)
+//		{
+//			recordedCommandsQueue.Remove (recordedCommand);
+//		}
 
-		public bool HasCommands()
-		{
-			return recordedCommandsQueue.Count > 0;
-		}
+//		public bool HasCommands()
+//		{
+//			return recordedCommandsQueue.Count > 0;
+//		}
 
 		public void Reset()
 		{
@@ -96,8 +100,7 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		gameFixedUpdate.Init ();
 		gameFixedUpdate.SetGameLogic (lockstepGameLogic);
 
-		_recording = true;
-		_commandsRecorder.Reset ();
+		StartRecording ();
 
 		// debug...
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
@@ -109,6 +112,22 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		gameFixedUpdate.Init ();
 		unit.SetPosition (new Vector2 (0, 0));
 	}
+
+	void StartPlayback()
+	{
+		_commandsRecorder.lastGameFrame = gameFixedUpdate.CurrentGameFrame;
+		_recording = false;
+
+		// resets game fixed update state...
+		ResetGameState();
+	}
+
+	void StartRecording()
+	{
+//		_commandsRecorder.Reset ();
+		_recording = true;
+		// ResetGameState();
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -118,14 +137,10 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
 //		int milliseconds = Mathf.RoundToInt(Time.deltaTime * 1000.0f);
-		gameFixedUpdate.Update (Time.deltaTime);
+
 
 		if (Input.GetKeyUp (KeyCode.P)) {
-
-			// resets game fixed update state...
-			ResetGameState();
-
-			_recording = false;
+			StartPlayback ();
 
 			return;
 		}
@@ -133,15 +148,14 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		if (Input.GetKeyUp (KeyCode.R)) {
 
 			// resets game fixed update state...
-			ResetGameState();
-
-			_recording = true;
-			_commandsRecorder.Reset ();
+			StartRecording();
 
 			return;
 		}
 
 		if (_recording) {
+
+			gameFixedUpdate.Update (Time.deltaTime);
 
 			if (Input.GetMouseButtonUp (1)) {
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
@@ -171,20 +185,20 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		
 			// playback...
 
-			do {
-				RecordedCommand recordedCommand = _commandsRecorder.GetFirstCommand ();
+			// if already at last frame, then dont update anymore...
+			if (_commandsRecorder.lastGameFrame == gameFixedUpdate.CurrentGameFrame)
+				return;
 
-				if (recordedCommand == null)
-					break;
+			gameFixedUpdate.Update (Time.deltaTime);
 
-				if (recordedCommand.gameFrame != gameFixedUpdate.CurrentGameFrame)
-					break;
+			List<Command> recordedCommands = new List<Command> ();
 
-				commandList.AddCommand (recordedCommand.command);
+			_commandsRecorder.GetCommandsForFrame(gameFixedUpdate.CurrentGameFrame, recordedCommands);
 
-				_commandsRecorder.RemoveCommand(recordedCommand);
-
-			} while (_commandsRecorder.HasCommands());
+			for (int i = 0; i < recordedCommands.Count; i++) {
+				var command = recordedCommands [i];
+				commandList.AddCommand (command);
+			}
 
 			commandList.IsReady = true;
 				
