@@ -34,6 +34,8 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 
 	public Camera camera;
 
+	public FeedbackClick feedbackClick;
+
 	void Awake()
 	{
 		lockstepGameLogic = new LockstepGameLogic (this, commandList);
@@ -59,10 +61,21 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 
 
 		if (Input.GetMouseButtonUp (1)) {
-		
 			Vector2 position = camera.ScreenToWorldPoint(Input.mousePosition);
-
 			commandList.AddCommand (new MoveCommand (unit, position));
+
+			feedbackClick.ShowFeedback (position);
+		}
+
+		if (Input.touchCount > 0) {
+		
+			if (Input.GetTouch(0).phase == TouchPhase.Ended) {
+				Vector2 position = camera.ScreenToWorldPoint(Input.GetTouch(0).position);
+				commandList.AddCommand (new MoveCommand (unit, position));			
+
+				feedbackClick.ShowFeedback (position);
+			}
+
 		}
 
 //		if (Input.GetKeyUp (KeyCode.LeftArrow)) {
