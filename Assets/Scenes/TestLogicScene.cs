@@ -10,7 +10,7 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		public int gameFrame;
 	}
 
-	public class ActionsRecorder
+	public class CommandsRecorder
 	{
 		readonly List<RecordedCommand> recordedCommandsQueue = new List<RecordedCommand>();
 
@@ -80,12 +80,12 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 
 	public FeedbackClick feedbackClick;
 
-	ActionsRecorder _commandsRecorder;
+	CommandsRecorder _commandsRecorder;
 	bool _recording;
 
 	void Awake()
 	{
-		_commandsRecorder = new ActionsRecorder ();
+		_commandsRecorder = new CommandsRecorder ();
 
 		lockstepGameLogic = new LockstepGameLogic (this, commandList);
 		lockstepGameLogic.GameFramesPerLockstep = (lockstepMilliseconds / fixedTimestepMilliseconds);
@@ -98,6 +98,16 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 
 		_recording = true;
 		_commandsRecorder.Reset ();
+
+		// debug...
+		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
+		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
+	}
+
+	void ResetGameState()
+	{
+		gameFixedUpdate.Init ();
+		unit.SetPosition (new Vector2 (0, 0));
 	}
 	
 	// Update is called once per frame
@@ -113,9 +123,7 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		if (Input.GetKeyUp (KeyCode.P)) {
 
 			// resets game fixed update state...
-			gameFixedUpdate.Init ();
-
-			unit.SetPosition (new Vector2 (0, 0));
+			ResetGameState();
 
 			_recording = false;
 
@@ -125,9 +133,7 @@ public class TestLogicScene : MonoBehaviour, DeterministicGameLogic {
 		if (Input.GetKeyUp (KeyCode.R)) {
 
 			// resets game fixed update state...
-			gameFixedUpdate.Init ();
-
-			unit.SetPosition (new Vector2 (0, 0));
+			ResetGameState();
 
 			_recording = true;
 			_commandsRecorder.Reset ();
