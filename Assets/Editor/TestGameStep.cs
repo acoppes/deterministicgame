@@ -1,5 +1,17 @@
 ﻿using NUnit.Framework;
 using System;
+using NUnit.Framework.Constraints;
+
+public static class Vector2Assert {
+
+	public static void AreEqual(UnityEngine.Vector2 v0, UnityEngine.Vector2 v1, float precision)
+	{
+		if (UnityEngine.Vector2.Distance (v0, v1) < precision)
+			return;
+		Assert.Fail (string.Format("Vectors {0}, {1} are not equal with precision {2}", v0, v1, precision));
+	}
+
+}
 
 public class TestGameStep {
 
@@ -157,6 +169,8 @@ public class TestGameStep {
 
 		Assert.That (UnityEngine.Vector2.Distance (unitView.GetCurrentPosition (0.1f), new UnityEngine.Vector2 (10, -10)) < distancePrecision);
 		Assert.That (UnityEngine.Vector2.Distance (unitView.GetCurrentPosition (0.1f), new UnityEngine.Vector2 (20, -20)) < distancePrecision);	
+	
+		Assert.That (UnityEngine.Vector2.Distance (unitView.GetCurrentPosition (0.8f), new UnityEngine.Vector2 (100, -100)) < distancePrecision);	
 	}
 
 	[Test]
@@ -170,6 +184,16 @@ public class TestGameStep {
 		unitView.UpdatePosition (1, new UnityEngine.Vector2 (410, -410));
 		Assert.AreEqual (unitView.GetCurrentPosition (0.1f), new UnityEngine.Vector2 (50, -50));
 //		Assert.That (UnityEngine.Vector2.Distance (unitView.GetCurrentPosition (0.1f), new UnityEngine.Vector2 (40, -40)) < distancePrecision);	
+	}
+
+	[Test]
+	public void TestUnitViewGetPositionIncrementalDt3()
+	{
+		UnitView unitView = new UnitView ();
+		unitView.SetPosition (0, new UnityEngine.Vector2 (0, 0));
+		unitView.UpdatePosition (0.05f, new UnityEngine.Vector2 (100, -100));
+
+		Vector2Assert.AreEqual (new UnityEngine.Vector2 (32.0f, -32.0f), unitView.GetCurrentPosition (0.016f), distancePrecision);
 	}
 
 }

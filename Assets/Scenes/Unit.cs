@@ -10,6 +10,8 @@ public class UnitView
 
 	float _accumulatedDt;
 
+	float _totalTime;
+
 	public void SetPosition (float time, Vector2 position)
 	{
 		_lastTime = time;
@@ -24,12 +26,13 @@ public class UnitView
 
 		// _accumulatedDt -= time;
 		_accumulatedDt = 0;
+		_totalTime = time;
 	}
 
 	public Vector2 GetCurrentPosition(float dt)
 	{
 		_accumulatedDt += dt;
-		_currentPosition = Vector2.Lerp (_p0, _p1, _accumulatedDt);
+		_currentPosition = Vector2.Lerp (_p0, _p1, _accumulatedDt / _totalTime);
 		return _currentPosition;
 	}
 
@@ -41,6 +44,8 @@ public class Unit : MonoBehaviour {
 
 	Vector2 _destination;
 
+	Vector2 _debugLastGamePosition;
+
 	public float speed = 1.0f;
 
 	bool _moving = false;
@@ -50,6 +55,7 @@ public class Unit : MonoBehaviour {
 	void Awake()
 	{
 		_gamePosition = transform.position;
+		_debugLastGamePosition = _gamePosition;
 
 		unitView = new UnitView ();
 		unitView.SetPosition (0, _gamePosition);
@@ -66,6 +72,8 @@ public class Unit : MonoBehaviour {
 		if (!_moving)
 			return;
 
+		_debugLastGamePosition = _gamePosition;
+
 		Vector2 direction = (_destination - _gamePosition).normalized;
 
 		float realSpeed = speed * dt;
@@ -79,7 +87,7 @@ public class Unit : MonoBehaviour {
 
 		_gamePosition = newPosition;
 
-		unitView.UpdatePosition (dt * frame, _gamePosition);
+		unitView.UpdatePosition (dt, _gamePosition);
 	}
 
 //	const float timePrecision = 0.0001f;
@@ -102,6 +110,15 @@ public class Unit : MonoBehaviour {
 //		transform.position = Vector3.Lerp (_lastGamePosition, _gamePosition, t / tdiff);
 //
 //		lerp += interpolationRate;
+	}
+
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.yellow;
+		Gizmos.DrawWireSphere (_debugLastGamePosition, 0.2f);
+
+		Gizmos.color = Color.green;
+		Gizmos.DrawWireSphere (_gamePosition, 0.2f);
 	}
 
 }
