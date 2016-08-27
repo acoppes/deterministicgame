@@ -65,50 +65,5 @@ public class TestGameStep {
 		Assert.That (gameStepEngine.lastDt, Is.EqualTo (0.05f));
 		Assert.That (gameStepEngine.lastFrame, Is.EqualTo (0));
 	}
-
-	[Test]
-	public void TestLockstepImplementation()
-	{
-		IntervalDeterministicGameLogic lockstepImplementation = new IntervalDeterministicGameLogic ();
-
-		lockstepImplementation.GameFramesPerLockstepFrame = 2;
-
-		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (0));
-
-		lockstepImplementation.Update (0.01f, 0);
-
-		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (0));
-
-		try {
-			lockstepImplementation.Update (0.01f, 2);
-		} catch {
-			Assert.Pass ();
-			return;
-		}
-
-		Assert.Fail ();
-
-		// Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (1));
-	}
-
-	[Test]
-	public void TestLockstepImplementation2()
-	{
-		IntervalDeterministicGameLogic lockstepImplementation = new IntervalDeterministicGameLogic ();
-
-		lockstepImplementation.GameFramesPerLockstepFrame = 2;
-
-		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (0));
-
-		lockstepImplementation.Update (0.01f, 0);
-		lockstepImplementation.Update (0.01f, 1);
-
-		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (1));
-
-		lockstepImplementation.Update (0.01f, 2);
-		lockstepImplementation.Update (0.01f, 3);
-
-		Assert.That (lockstepImplementation.CurrentLockstepFrame, Is.EqualTo (2));
-	}
 		
 }
