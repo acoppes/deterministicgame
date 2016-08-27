@@ -1,7 +1,7 @@
 
 public class LockstepGameLogic : GameLogic
 {
-	GameLogic _gameLogic;
+	GameLogic _delegateGameLogic;
 
 	readonly CommandsList _pendingCommands;
 
@@ -23,7 +23,7 @@ public class LockstepGameLogic : GameLogic
 
 	public LockstepGameLogic(GameLogic gameLogic, CommandsList pendingCommands)
 	{
-		_gameLogic = gameLogic;
+		_delegateGameLogic = gameLogic;
 		_pendingCommands = pendingCommands;
 	}
 
@@ -38,7 +38,7 @@ public class LockstepGameLogic : GameLogic
 
 		_currentGameFrame++;
 
-		_gameLogic.Update (dt, _currentGameFrame);
+		_delegateGameLogic.Update (dt, _currentGameFrame);
 	}
 
 	#endregion

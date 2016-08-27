@@ -78,7 +78,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 	public Unit unit;
 
 	public int fixedTimestepMilliseconds = 100;
-	public int lockstepMilliseconds = 500;
+	public int gameFramesPerLockstep = 4;
 
 	public Camera camera;
 
@@ -92,7 +92,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 		_commandsRecorder = new CommandsRecorder ();
 
 		lockstepGameLogic = new LockstepGameLogic (this, commandList);
-		lockstepGameLogic.GameFramesPerLockstep = (lockstepMilliseconds / fixedTimestepMilliseconds);
+		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
 
 		gameFixedUpdate = new GameFixedUpdate ();
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
@@ -135,7 +135,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 	void Update () {
 
 		// update values
-		lockstepGameLogic.GameFramesPerLockstep = (lockstepMilliseconds / fixedTimestepMilliseconds);
+		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
 //		int milliseconds = Mathf.RoundToInt(Time.deltaTime * 1000.0f);
