@@ -69,9 +69,11 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 		}
 	}
 
-	GameFixedUpdate gameFixedUpdate;
+//	GameFixedUpdate gameFixedUpdate;
 
-	LockstepGameLogic lockstepGameLogic;
+//	LockstepGameLogic lockstepGameLogic;
+
+	LockstepFixedUpdate gameFixedUpdate;
 
 	CommandsList commandList = new CommandsList();
 
@@ -91,14 +93,18 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 	{
 		_commandsRecorder = new CommandsRecorder ();
 
-		lockstepGameLogic = new LockstepGameLogic (this, commandList);
-		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
-
-		gameFixedUpdate = new GameFixedUpdate ();
+		gameFixedUpdate = new LockstepFixedUpdate (commandList);
+		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
+//		lockstepGameLogic = new LockstepGameLogic (this, commandList);
+//		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
+//
+//		gameFixedUpdate = new GameFixedUpdate ();
+//		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
+
 		gameFixedUpdate.Init ();
-		gameFixedUpdate.SetGameLogic (lockstepGameLogic);
+		gameFixedUpdate.SetGameLogic (this);
 
 		StartRecording ();
 
@@ -135,8 +141,12 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 	void Update () {
 
 		// update values
-		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
+
+		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
+
+//		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
+//		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
 //		int milliseconds = Mathf.RoundToInt(Time.deltaTime * 1000.0f);
 
