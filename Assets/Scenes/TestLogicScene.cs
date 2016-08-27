@@ -93,7 +93,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 	{
 		_commandsRecorder = new CommandsRecorder ();
 
-		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLocksteLogic(commandList));
+		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 

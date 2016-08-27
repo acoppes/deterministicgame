@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NSubstitute;
 
 public class TestLockstepLogic {
 
@@ -9,12 +10,13 @@ public class TestLockstepLogic {
 
 		var gameLogic = new TestGameStep.GameStepEngineMock ();
 
-		CommandsList pendingCommands = new CommandsList ();
-		pendingCommands.IsReady = false;
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
 
-		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (new CommandsListLocksteLogic(pendingCommands));
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
 		lockstepGameLogic.GameFramesPerLockstep = 1;
 		lockstepGameLogic.SetGameLogic (gameLogic);
+
+		lockstepLogic.IsReady ().Returns (false);
 
 //		LockstepGameLogic lockstepGameLogic = new LockstepGameLogic (gameLogic, pendingCommands);
 
@@ -26,7 +28,7 @@ public class TestLockstepLogic {
 
 		Assert.That (gameLogic.lastFrame, Is.EqualTo (0));
 
-		pendingCommands.IsReady = true;
+		lockstepLogic.IsReady ().Returns (true);
 
 		lockstepGameLogic.Update (0.1f);
 

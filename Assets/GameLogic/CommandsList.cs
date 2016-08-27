@@ -27,11 +27,11 @@ public class CommandsList
 	}
 }
 
-public class CommandsListLocksteLogic : LockstepLogic 
+public class CommandsListLockstepLogic : LockstepLogic 
 {
 	readonly CommandsList _commandsList;
 
-	public CommandsListLocksteLogic(CommandsList commandsList)
+	public CommandsListLockstepLogic(CommandsList commandsList)
 	{
 		_commandsList = commandsList;
 	}
