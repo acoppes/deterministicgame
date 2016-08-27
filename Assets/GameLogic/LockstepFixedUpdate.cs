@@ -1,13 +1,20 @@
 
+public interface LockstepLogic
+{
+	bool IsReady();
+
+	void Process();
+}
+
 public class LockstepFixedUpdate : GameFixedUpdate
 {
 	int _gameFramesPerLockstep;
 
-	readonly CommandsList _pendingCommands;
+	readonly LockstepLogic _lockstepLogic;
 
-	public LockstepFixedUpdate(CommandsList pendingCommands)
+	public LockstepFixedUpdate(LockstepLogic lockstepLogic)
 	{
-		_pendingCommands = pendingCommands;
+		_lockstepLogic = lockstepLogic;
 	}
 
 	public int GameFramesPerLockstep {
@@ -36,7 +43,7 @@ public class LockstepFixedUpdate : GameFixedUpdate
 	bool IsReady()
 	{
 		// check for pending actions...
-		return _pendingCommands.IsReady;
+		return _lockstepLogic.IsReady();
 	}
 
 	bool IsLockstepTurn() 
@@ -47,6 +54,6 @@ public class LockstepFixedUpdate : GameFixedUpdate
 	void ProcessLockstepLogic()
 	{
 		// process pending actions..
-		_pendingCommands.Process();
+		_lockstepLogic.Process();
 	}
 }

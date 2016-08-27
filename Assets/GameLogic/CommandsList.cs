@@ -26,3 +26,25 @@ public class CommandsList
 		IsReady = false;
 	}
 }
+
+public class CommandsListLocksteLogic : LockstepLogic 
+{
+	readonly CommandsList _commandsList;
+
+	public CommandsListLocksteLogic(CommandsList commandsList)
+	{
+		_commandsList = commandsList;
+	}
+
+	#region LockstepLogic implementation
+	public bool IsReady ()
+	{
+		return _commandsList.IsReady;
+	}
+	public void Process ()
+	{
+		_commandsList.Process ();
+	}
+	#endregion
+	
+}

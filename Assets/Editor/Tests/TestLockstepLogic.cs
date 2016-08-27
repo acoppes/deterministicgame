@@ -12,7 +12,7 @@ public class TestLockstepLogic {
 		CommandsList pendingCommands = new CommandsList ();
 		pendingCommands.IsReady = false;
 
-		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (pendingCommands);
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (new CommandsListLocksteLogic(pendingCommands));
 		lockstepGameLogic.GameFramesPerLockstep = 1;
 		lockstepGameLogic.SetGameLogic (gameLogic);
 
