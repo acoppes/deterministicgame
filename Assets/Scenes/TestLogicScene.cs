@@ -1,54 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class TestLogicScene : MonoBehaviour, GameLogic {
-
-	public class RecordedCommand
-	{
-		public Command command;
-		public float gameTime;
-		public int gameFrame;
-	}
-
-	public class CommandsRecorder
-	{
-		readonly List<RecordedCommand> recordedCommandsQueue = new List<RecordedCommand>();
-
-		public int lastGameFrame;
-
-		public void AddCommand(float gameTime, int gameFrame, Command command)
-		{
-			recordedCommandsQueue.Add (new RecordedCommand () { 
-				command = command,
-				gameTime = gameTime,
-				gameFrame = gameFrame
-			});
-		}
-
-		public void GetCommandsForFrame(int frame, List<Command> commands)
-		{
-			for (int i = 0; i < recordedCommandsQueue.Count; i++) {
-				var recordedCommand = recordedCommandsQueue [i];
-				if (recordedCommand.gameFrame == frame)
-					commands.Add (recordedCommand.command);
-			}
-		}
-
-//		public void RemoveCommand(RecordedCommand recordedCommand)
-//		{
-//			recordedCommandsQueue.Remove (recordedCommand);
-//		}
-
-//		public bool HasCommands()
-//		{
-//			return recordedCommandsQueue.Count > 0;
-//		}
-
-		public void Reset()
-		{
-			recordedCommandsQueue.Clear ();
-		}
-	}
+public class TestLogicScene : MonoBehaviour, GameLogic, GameState {
 
 	public class MoveCommand : Command
 	{
@@ -91,9 +44,22 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 
 	public RecorderView recorderView;
 
+	ChecksumRecorder _checksumRecorder;
+
+	#region GameState implementation
+
+	public Checksum CalculateChecksum ()
+	{
+		return new ChecksumString("ABCDEF12341234");
+	}
+
+	#endregion
+
 	void Awake()
 	{
 		_commandsRecorder = new CommandsRecorder ();
+
+		_checksumRecorder = new ChecksumRecorder (10, this);
 
 		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
@@ -113,6 +79,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 		// debug...
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
+
+		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
+		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
 
 		Application.targetFrameRate = 60;
 	}
@@ -227,6 +196,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 	public void Update (float dt, int frame)
 	{
 		// Debug.Log ("Timestep: " + frame);
+		_checksumRecorder.Update(dt, frame);
 		unit.GameUpdate (dt, frame);
 	}
 
