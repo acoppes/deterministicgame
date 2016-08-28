@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public interface GameState
+public interface ChecksumProvider
 {
 	Checksum CalculateChecksum();
 }
@@ -83,7 +83,7 @@ public class GameStateValidatorImpl : GameStateValidator
 
 public class ChecksumRecorder : GameLogic
 {
-	readonly GameState _gameState;
+	readonly ChecksumProvider _checksumProvider;
 
 	readonly List<StoredChecksum> _storedChecksums = new List<StoredChecksum>();
 
@@ -97,10 +97,10 @@ public class ChecksumRecorder : GameLogic
 		}
 	}
 
-	public ChecksumRecorder(int gameFramesPerChecksum, GameState gameState)
+	public ChecksumRecorder(int gameFramesPerChecksum, ChecksumProvider checksumProvider)
 	{
 		_gameFramesPerChecksum = gameFramesPerChecksum;
-		_gameState = gameState;
+		_checksumProvider = checksumProvider;
 
 		_checksumFrame = _gameFramesPerChecksum;
 	}
@@ -111,7 +111,7 @@ public class ChecksumRecorder : GameLogic
 		if (_checksumFrame <= 0) {
 			_storedChecksums.Add (new StoredChecksum () {
 				gameFrame = frame,
-				checksum = _gameState.CalculateChecksum ()
+				checksum = _checksumProvider.CalculateChecksum ()
 			});
 			_checksumFrame = _gameFramesPerChecksum;
 		}

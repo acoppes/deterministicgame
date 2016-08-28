@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Text;
 
 public class UnitView
 {
@@ -51,6 +52,17 @@ public class Unit : MonoBehaviour {
 
 	UnitView unitView;
 
+	// TODO: this is used for checksum, add interface for this
+	public void AddState(StringBuilder strBuilder)
+	{
+		strBuilder.Append (_gamePosition.x);
+		strBuilder.Append (_gamePosition.y);
+		strBuilder.Append (speed);
+		strBuilder.Append (_moving);
+		strBuilder.Append (_destination.x);
+		strBuilder.Append (_destination.y);
+	}
+
 	void Awake()
 	{
 		_gamePosition = transform.position;
@@ -58,6 +70,9 @@ public class Unit : MonoBehaviour {
 
 		unitView = new UnitView ();
 		unitView.SetPosition (0, _gamePosition);
+
+		_destination = _gamePosition;
+		_moving = false;
 	}
 
 	public void SetPosition(Vector2 position)
@@ -68,6 +83,9 @@ public class Unit : MonoBehaviour {
 		_debugLastGamePosition = _gamePosition;
 
 		unitView.SetPosition (0, _gamePosition);
+
+		_destination = _gamePosition;
+		_moving = false;
 	}
 
 	public void MoveTo(Vector2 destination)

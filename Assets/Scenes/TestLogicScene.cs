@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.IO;
+using System.Text;
 
-public class TestLogicScene : MonoBehaviour, GameLogic, GameState {
+public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 
 	public class MoveCommand : Command
 	{
@@ -50,7 +53,28 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameState {
 
 	public Checksum CalculateChecksum ()
 	{
-		return new ChecksumString("ABCDEF12341234");
+//		MemoryStream stream = new MemoryStream ();
+//		stream.
+
+		StringBuilder strBuilder = new StringBuilder ();
+//		strBuilder.Append( // local state
+		// strBuilder.Append(gameFixedUpdate.CurrentGameFrame);
+		unit.AddState (strBuilder);
+
+		byte[] md5hash = MD5.Create ().ComputeHash (Encoding.UTF8.GetBytes (strBuilder.ToString ()));
+
+		StringBuilder sBuilder = new StringBuilder();
+
+		// Loop through each byte of the hashed data 
+		// and format each one as a hexadecimal string.
+		for (int i = 0; i < md5hash.Length; i++)
+		{
+			sBuilder.Append(md5hash[i].ToString("x2"));
+		}
+
+		// Return the hexadecimal string.
+		return new ChecksumString(sBuilder.ToString());
+//		return new ChecksumString(strBuilder.ToString());
 	}
 
 	#endregion
@@ -60,6 +84,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameState {
 		_commandsRecorder = new CommandsRecorder ();
 
 		_checksumRecorder = new ChecksumRecorder (10, this);
+
+		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
+		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
 
 		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
@@ -80,9 +107,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameState {
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
 
-		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
-		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
-
 		Application.targetFrameRate = 60;
 	}
 
@@ -101,6 +125,11 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameState {
 		ResetGameState();
 
 		recorderView.StartPlayback ();
+
+		_checksumRecorder = new ChecksumRecorder (10, this);
+
+		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
+		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
 	}
 
 	void StartRecording()
