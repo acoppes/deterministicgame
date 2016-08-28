@@ -89,6 +89,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 	CommandsRecorder _commandsRecorder;
 	bool _recording;
 
+	public RecorderView recorderView;
+
 	void Awake()
 	{
 		_commandsRecorder = new CommandsRecorder ();
@@ -128,6 +130,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 
 		// resets game fixed update state...
 		ResetGameState();
+
+		recorderView.StartPlayback ();
 	}
 
 	void StartRecording()
@@ -135,6 +139,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic {
 //		_commandsRecorder.Reset ();
 		_recording = true;
 		// ResetGameState();
+		recorderView.StartRecording();
 	}
 	
 	// Update is called once per frame

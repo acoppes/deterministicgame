@@ -45,6 +45,8 @@ public class Unit : MonoBehaviour {
 
 	public float speed = 1.0f;
 
+	public bool interpolationEnabled = true;
+
 	bool _moving = false;
 
 	UnitView unitView;
@@ -99,7 +101,11 @@ public class Unit : MonoBehaviour {
 
 	void LateUpdate()
 	{
-		transform.position = unitView.GetCurrentPosition (Time.deltaTime);
+		if (interpolationEnabled) {
+			transform.position = unitView.GetCurrentPosition (Time.deltaTime);
+		} else {
+			transform.position = _gamePosition;
+		}
 	}
 
 	void OnDrawGizmos()
