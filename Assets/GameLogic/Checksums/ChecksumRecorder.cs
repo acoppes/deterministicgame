@@ -17,6 +17,11 @@ public class ChecksumRecorder
 		_checksumProvider = checksumProvider;
 	}
 
+	public void Reset()
+	{
+		_storedChecksums.Clear ();
+	}
+
 	public void RecordState (int frame)
 	{
 		_storedChecksums.Add (new StoredChecksum () {

@@ -7,6 +7,11 @@ public class ChecksumRecorderDebug : MonoBehaviour
 
 	public List<string> checksums = new List<string>();
 
+	public void Reset()
+	{
+		checksums.Clear ();
+	}
+
 	void Update()
 	{
 		while (checksumRecorder.StoredChecksums.Count > checksums.Count) {

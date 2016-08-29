@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.IO;
 using System.Text;
 
 public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
@@ -57,27 +55,12 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 
 	public Checksum CalculateChecksum ()
 	{
-//		MemoryStream stream = new MemoryStream ();
-//		stream.
-
 		StringBuilder strBuilder = new StringBuilder ();
-//		strBuilder.Append( // local state
-		// strBuilder.Append(gameFixedUpdate.CurrentGameFrame);
+
+		strBuilder.Append(gameFixedUpdate.CurrentGameFrame);
 		unit.AddState (strBuilder);
 
-		byte[] md5hash = MD5.Create ().ComputeHash (Encoding.UTF8.GetBytes (strBuilder.ToString ()));
-
-		StringBuilder sBuilder = new StringBuilder();
-
-		// Loop through each byte of the hashed data 
-		// and format each one as a hexadecimal string.
-		for (int i = 0; i < md5hash.Length; i++)
-		{
-			sBuilder.Append(md5hash[i].ToString("x2"));
-		}
-
-		// Return the hexadecimal string.
-		return new ChecksumString(sBuilder.ToString());
+		return new ChecksumString(ChecksumHelper.CalculateMD5(strBuilder.ToString()));
 //		return new ChecksumString(strBuilder.ToString());
 	}
 
@@ -95,12 +78,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
-
-//		lockstepGameLogic = new LockstepGameLogic (this, commandList);
-//		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
-//
-//		gameFixedUpdate = new GameFixedUpdate ();
-//		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
 		gameFixedUpdate.Init ();
 		gameFixedUpdate.SetGameLogic (this);
@@ -131,35 +108,25 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 		recorderView.StartPlayback ();
 
 		_checksumValidator = new ChecksumValidatorBasic (_checksumRecorder.StoredChecksums);
-
-		_checksumRecorder = new ChecksumRecorder (this);
-
-		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
-		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
 	}
 
 	void StartRecording()
 	{
-//		_commandsRecorder.Reset ();
 		_recording = true;
-		// ResetGameState();
 		recorderView.StartRecording();
+
+		_checksumRecorder.Reset ();
+
+		ChecksumRecorderDebug checksumRecorderDebug = gameObject.GetComponent<ChecksumRecorderDebug> ();
+		checksumRecorderDebug.Reset ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		// update values
-
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
-
-//		lockstepGameLogic.GameFramesPerLockstep = gameFramesPerLockstep;
-//		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
-
-//		int milliseconds = Mathf.RoundToInt(Time.deltaTime * 1000.0f);
-
-
+	
 		if (Input.GetKeyUp (KeyCode.P)) {
 			StartPlayback ();
 
@@ -228,16 +195,22 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 
 	#region DeterministicGameLogic implementation
 
+	bool IsChecksumFrame(int frame)
+	{
+		return (frame % gameFramesPerChecksumCheck) == 0;
+	}
+
 	public void Update (float dt, int frame)
 	{
 		// Debug.Log ("Timestep: " + frame);
 
-		if ((frame % gameFramesPerChecksumCheck) == 0) {
+		if (IsChecksumFrame(frame)) {
 			if (!_recording && _checksumValidator != null) {
 				bool validState = _checksumValidator.IsValid (frame, CalculateChecksum ());
-				Debug.Log (string.Format("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
+				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
+			} else {
+				_checksumRecorder.RecordState (frame);
 			}
-			_checksumRecorder.RecordState(frame);
 		}
 
 		unit.GameUpdate (dt, frame);

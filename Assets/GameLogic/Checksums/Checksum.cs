@@ -17,12 +17,9 @@ public class StoredChecksum
 {
 	public int gameFrame;
 	public Checksum checksum;
-
 }
 
 public interface ChecksumValidator
 {
 	bool IsValid(int gameFrame, Checksum checksum);
 }
-
-

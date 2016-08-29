@@ -9,8 +9,6 @@ public class ChecksumValidatorBasic : ChecksumValidator
 		_checksums = checksums;
 	}
 
-	#region GameStateValidator implementation
-
 	public bool IsValid (int gameFrame, Checksum checksum)
 	{
 		for (int i = 0; i < _checksums.Count; i++) {
@@ -20,7 +18,5 @@ public class ChecksumValidatorBasic : ChecksumValidator
 		}
 		return false;
 	}
-
-	#endregion
 
 }
