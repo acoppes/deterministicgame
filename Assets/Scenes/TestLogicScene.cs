@@ -49,6 +49,10 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 
 	ChecksumRecorder _checksumRecorder;
 
+	ChecksumValidator _checksumValidator;
+
+	public int gameFramesPerChecksumCheck = 10;
+
 	#region GameState implementation
 
 	public Checksum CalculateChecksum ()
@@ -83,7 +87,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 	{
 		_commandsRecorder = new CommandsRecorder ();
 
-		_checksumRecorder = new ChecksumRecorder (10, this);
+		_checksumRecorder = new ChecksumRecorder (this);
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
@@ -126,7 +130,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 
 		recorderView.StartPlayback ();
 
-		_checksumRecorder = new ChecksumRecorder (10, this);
+		_checksumValidator = new ChecksumValidatorBasic (_checksumRecorder.StoredChecksums);
+
+		_checksumRecorder = new ChecksumRecorder (this);
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
@@ -225,7 +231,15 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 	public void Update (float dt, int frame)
 	{
 		// Debug.Log ("Timestep: " + frame);
-		_checksumRecorder.Update(dt, frame);
+
+		if ((frame % gameFramesPerChecksumCheck) == 0) {
+			if (!_recording && _checksumValidator != null) {
+				bool validState = _checksumValidator.IsValid (frame, CalculateChecksum ());
+				Debug.Log (string.Format("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
+			}
+			_checksumRecorder.RecordState(frame);
+		}
+
 		unit.GameUpdate (dt, frame);
 	}
 

@@ -45,8 +45,15 @@ public class GameFixedUpdate {
 		_gameTime = 0;
 	}
 
+	// fixed time step based on http://gafferongames.com/game-physics/fix-your-timestep/
+
+	const float maxAllowedFrameTime = 0.25f;
+
 	public virtual void Update(float dt)
 	{
+		if (dt > maxAllowedFrameTime)
+			dt = maxAllowedFrameTime;
+
 		_accumulatedTime += dt;
 		_gameTime += dt;
 

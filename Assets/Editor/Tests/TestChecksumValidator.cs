@@ -20,7 +20,7 @@ public class TestChecksumValidator {
 	[Test]
 	public void LockstepTurnShouldNotAdvanceIfWaitingForActions(){
 		
-		GameStateValidator gameStateValidator = new GameStateValidatorImpl (new List<StoredChecksum>() {
+		ChecksumValidator gameStateValidator = new ChecksumValidatorBasic (new List<StoredChecksum>() {
 			{ 
 				new StoredChecksum() {
 					gameFrame = 0,
