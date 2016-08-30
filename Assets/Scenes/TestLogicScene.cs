@@ -2,7 +2,32 @@
 using System.Collections.Generic;
 using System.Text;
 
-public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
+public interface GameStateProvider
+{
+	string GetGameState();
+}
+
+public class GameStateChecksumProvider : ChecksumProvider
+{
+	readonly GameStateProvider _gameStateProvider;
+
+	public GameStateChecksumProvider(GameStateProvider gameStateProvider)
+	{
+		_gameStateProvider = gameStateProvider;
+	}
+
+	#region ChecksumProvider implementation
+
+	public Checksum CalculateChecksum ()
+	{
+		return new ChecksumString(ChecksumHelper.CalculateMD5(_gameStateProvider.GetGameState()));
+	}
+
+	#endregion
+	
+}
+
+public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	public class MoveCommand : Command
 	{
@@ -51,26 +76,29 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 
 	public int gameFramesPerChecksumCheck = 10;
 
-	#region GameState implementation
+	#region GameStateProvider implementation
 
-	public Checksum CalculateChecksum ()
+	public string GetGameState ()
 	{
 		StringBuilder strBuilder = new StringBuilder ();
 
 		strBuilder.Append(gameFixedUpdate.CurrentGameFrame);
 		unit.AddState (strBuilder);
 
-		return new ChecksumString(ChecksumHelper.CalculateMD5(strBuilder.ToString()));
-//		return new ChecksumString(strBuilder.ToString());
+		return strBuilder.ToString ();
 	}
 
 	#endregion
+
+	ChecksumProvider _checksumProvider;
 
 	void Awake()
 	{
 		_commandsRecorder = new CommandsRecorder ();
 
-		_checksumRecorder = new ChecksumRecorder (this);
+		_checksumProvider = new GameStateChecksumProvider (this);
+
+		_checksumRecorder = new ChecksumRecorder (_checksumProvider);
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
@@ -206,7 +234,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, ChecksumProvider {
 
 		if (IsChecksumFrame(frame)) {
 			if (!_recording && _checksumValidator != null) {
-				bool validState = _checksumValidator.IsValid (frame, CalculateChecksum ());
+				bool validState = _checksumValidator.IsValid (frame, _checksumProvider.CalculateChecksum ());
 				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
 			} else {
 				_checksumRecorder.RecordState (frame);
