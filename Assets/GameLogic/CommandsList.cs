@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class CommandsList
 {
-	readonly List<Command> commands = new List<Command>();
+	readonly List<Command> _commands = new List<Command>();
 
 	public bool IsReady {
 		get;
@@ -11,45 +11,65 @@ public class CommandsList
 
 	public List<Command> Commands {
 		get {
-			return commands;
+			return _commands;
 		}
 	}
 
 	public void AddCommand(Command command)
 	{
-		commands.Add (command);
+		_commands.Add (command);
 	}
 
-	public void Process()
+	public void GetCommands(int frame, List<Command> commands)
+	{
+		for (int i = 0; i < _commands.Count; i++) {
+			if (_commands [i].ProcessFrame == frame)
+				commands.Add (_commands [i]);
+		}
+	}
+
+	public void RemoveCommands(List<Command> commands)
 	{
 		for (int i = 0; i < commands.Count; i++) {
 			var command = commands [i];
-			command.Process ();
+			_commands.Remove (command);
 		}
-
-		commands.Clear ();
-
-		IsReady = false;
 	}
 }
 
 public class CommandsListLockstepLogic : LockstepLogic 
 {
 	readonly CommandsList _commandsList;
+	readonly GameFixedUpdate _gameFixedUpdate;
 
-	public CommandsListLockstepLogic(CommandsList commandsList)
+	public CommandsListLockstepLogic(GameFixedUpdate gameFixedUpdate, CommandsList commandsList)
 	{
 		_commandsList = commandsList;
+		_gameFixedUpdate = gameFixedUpdate;
 	}
 
 	#region LockstepLogic implementation
+
 	public bool IsReady ()
 	{
 		return _commandsList.IsReady;
 	}
+
+	List<Command> frameCommands = new List<Command>();
+
 	public void Process ()
 	{
-		_commandsList.Process ();
+		_commandsList.GetCommands (_gameFixedUpdate.CurrentGameFrame, frameCommands);
+
+		for (int i = 0; i < frameCommands.Count; i++) {
+			var command = frameCommands [i];
+			command.Process ();
+		}
+
+		_commandsList.RemoveCommands (frameCommands);
+		_commandsList.IsReady = false;
+
+		frameCommands.Clear ();
 	}
 	#endregion
 	

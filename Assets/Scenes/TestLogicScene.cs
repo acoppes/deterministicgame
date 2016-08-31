@@ -63,7 +63,9 @@ public class Replay
 		_recording = true;
 		_recorderView.StartRecording();
 
-		_checksumRecorder.Reset ();
+		// we could have a Reset() for the replay system if we want to start from 0...
+
+		// _checksumRecorder.Reset ();
 	}
 
 	public void RecordCommands()
@@ -103,17 +105,18 @@ public class Replay
 	{
 		ChecksumProvider checksumProvider = _checksumRecorder.ChecksumProvider;
 
-		if (IsChecksumFrame(frame)) {
-			if (!_recording && _checksumValidator != null) {
-				bool validState = _checksumValidator.IsValid (frame, checksumProvider.CalculateChecksum ());
-				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
-			} else {
-				_checksumRecorder.RecordState (frame);
-			}
-		}
-
 		if (_recording) {
 			_lastRecordedGameFrame = _gameFixedUpdate.CurrentGameFrame;
+
+			if (IsChecksumFrame (frame)) {
+				_checksumRecorder.RecordState (frame);
+			}
+		} else {
+			
+			if (IsChecksumFrame (frame)) {
+				bool validState = _checksumValidator.IsValid (frame, checksumProvider.CalculateChecksum ());
+				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
+			}
 		}
 	}
 
@@ -183,7 +186,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 		// TODO: set replay....
 
-		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
+		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(gameFixedUpdate, commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
@@ -250,8 +253,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 				feedbackClick.ShowFeedback (position);
 
 				_replay.RecordCommands ();
-
-//				_commandsRecorder.AddCommand (gameFixedUpdate.GameTime, gameFixedUpdate.CurrentGameFrame, moveCommand);
 			}
 
 			if (Input.touchCount > 0) {
@@ -263,8 +264,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 					feedbackClick.ShowFeedback (position);
 
 					_replay.RecordCommands ();
-
-//					_commandsRecorder.AddCommand (gameFixedUpdate.GameTime, gameFixedUpdate.CurrentGameFrame, moveCommand);
 				}
 
 			}
