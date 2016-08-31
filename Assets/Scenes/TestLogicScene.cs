@@ -2,31 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 
-public interface GameStateProvider
-{
-	string GetGameState();
-}
-
-public class GameStateChecksumProvider : ChecksumProvider
-{
-	readonly GameStateProvider _gameStateProvider;
-
-	public GameStateChecksumProvider(GameStateProvider gameStateProvider)
-	{
-		_gameStateProvider = gameStateProvider;
-	}
-
-	#region ChecksumProvider implementation
-
-	public Checksum CalculateChecksum ()
-	{
-		return new ChecksumString(ChecksumHelper.CalculateMD5(_gameStateProvider.GetGameState()));
-	}
-
-	#endregion
-	
-}
-
 public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	public class MoveCommand : Command
@@ -44,13 +19,13 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		{
 			base.Process ();
 			unit.MoveTo (destination);
-//			gameObject.transform.position = gameObject.transform.position + new Vector3 (1 * direction, 0, 0);
 		}
 	}
 
-//	GameFixedUpdate gameFixedUpdate;
-
-//	LockstepGameLogic lockstepGameLogic;
+//	public class Replay
+//	{
+//		
+//	}
 
 	LockstepFixedUpdate gameFixedUpdate;
 
@@ -241,6 +216,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 			}
 		}
 
+		// update game state...
 		unit.GameUpdate (dt, frame);
 	}
 
