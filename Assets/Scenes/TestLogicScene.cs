@@ -186,7 +186,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 		// TODO: set replay....
 
-		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(gameFixedUpdate, commandList));
+		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
@@ -247,7 +247,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 			if (Input.GetMouseButtonUp (1)) {
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
-				var moveCommand = new MoveCommand (unit, position);
+				var moveCommand = new MoveCommand (unit, position) {
+					ProcessFrame = gameFixedUpdate.GetNextLockstepFrame()	
+				};
 
 				commandList.AddCommand (moveCommand);
 				feedbackClick.ShowFeedback (position);
@@ -259,7 +261,11 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		
 				if (Input.GetTouch (0).phase == TouchPhase.Ended) {
 					Vector2 position = camera.ScreenToWorldPoint (Input.GetTouch (0).position);
-					var moveCommand = new MoveCommand (unit, position);
+
+					var moveCommand = new MoveCommand (unit, position) {
+						ProcessFrame = gameFixedUpdate.GetNextLockstepFrame()
+					};
+
 					commandList.AddCommand (moveCommand);			
 					feedbackClick.ShowFeedback (position);
 

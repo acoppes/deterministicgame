@@ -3,7 +3,7 @@ public interface LockstepLogic
 {
 	bool IsReady();
 
-	void Process();
+	void Process(int frame);
 }
 
 public class LockstepFixedUpdate : GameFixedUpdate
@@ -54,6 +54,12 @@ public class LockstepFixedUpdate : GameFixedUpdate
 	void ProcessLockstepLogic()
 	{
 		// process pending actions..
-		_lockstepLogic.Process();
+		_lockstepLogic.Process(CurrentGameFrame);
+	}
+
+	public int GetNextLockstepFrame ()
+	{
+		int d = (CurrentGameFrame / _gameFramesPerLockstep) + 1;
+		return _gameFramesPerLockstep * d;
 	}
 }

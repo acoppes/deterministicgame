@@ -40,12 +40,10 @@ public class CommandsList
 public class CommandsListLockstepLogic : LockstepLogic 
 {
 	readonly CommandsList _commandsList;
-	readonly GameFixedUpdate _gameFixedUpdate;
 
-	public CommandsListLockstepLogic(GameFixedUpdate gameFixedUpdate, CommandsList commandsList)
+	public CommandsListLockstepLogic(CommandsList commandsList)
 	{
 		_commandsList = commandsList;
-		_gameFixedUpdate = gameFixedUpdate;
 	}
 
 	#region LockstepLogic implementation
@@ -55,11 +53,11 @@ public class CommandsListLockstepLogic : LockstepLogic
 		return _commandsList.IsReady;
 	}
 
-	List<Command> frameCommands = new List<Command>();
+	readonly List<Command> frameCommands = new List<Command>();
 
-	public void Process ()
+	public void Process (int frame)
 	{
-		_commandsList.GetCommands (_gameFixedUpdate.CurrentGameFrame, frameCommands);
+		_commandsList.GetCommands (frame, frameCommands);
 
 		for (int i = 0; i < frameCommands.Count; i++) {
 			var command = frameCommands [i];
