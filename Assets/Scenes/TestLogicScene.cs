@@ -38,6 +38,12 @@ public class Replay
 		}
 	}
 
+	public float NormalizedTime {
+		get { 
+			return (float) _gameFixedUpdate.CurrentGameFrame / (float) _lastRecordedGameFrame;
+		}
+	}
+
 	public Replay(GameFixedUpdate gameFixedUpdate, ChecksumRecorder checksumRecorder, RecorderView recorderView, CommandsList commandsList)
 	{
 		_recording = true;
@@ -47,6 +53,8 @@ public class Replay
 		_gameFixedUpdate = gameFixedUpdate;
 		_recorderView = recorderView;
 		_commandsList = commandsList;
+
+		_recorderView.SetReplay (this);
 	}
 
 	public void StartPlayback()
