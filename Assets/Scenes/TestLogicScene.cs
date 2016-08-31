@@ -211,12 +211,27 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		unit.SetPosition (new Vector2 (0, 0));
 	}
 
+	public void ToggleRecording()
+	{
+		if (_replay.IsRecording) {
+			StartPlayback ();
+		} else {
+			StartRecording ();
+		}
+	}
+
 	void StartRecording()
 	{
 		_replay.StartRecording ();
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.GetComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.Reset ();
+	}
+
+	void StartPlayback()
+	{
+		ResetGameState ();
+		_replay.StartPlayback ();
 	}
 	
 	// Update is called once per frame
@@ -226,10 +241,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 	
 		if (Input.GetKeyUp (KeyCode.P)) {
-
-			ResetGameState ();
-			_replay.StartPlayback ();
-
+			StartPlayback ();
 			return;
 		}
 
