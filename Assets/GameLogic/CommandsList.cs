@@ -9,6 +9,12 @@ public class CommandsList
 		set;
 	}
 
+	public List<Command> Commands {
+		get {
+			return commands;
+		}
+	}
+
 	public void AddCommand(Command command)
 	{
 		commands.Add (command);

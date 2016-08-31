@@ -12,7 +12,7 @@ public class CommandsRecorder
 
 	readonly List<RecordedCommand> recordedCommandsQueue = new List<RecordedCommand>();
 
-	public int lastGameFrame;
+//	public int lastGameFrame;
 
 	public void AddCommand(float gameTime, int gameFrame, Command command)
 	{

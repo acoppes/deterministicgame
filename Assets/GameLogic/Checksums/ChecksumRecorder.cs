@@ -12,6 +12,12 @@ public class ChecksumRecorder
 		}
 	}
 
+	public ChecksumProvider ChecksumProvider {
+		get {
+			return _checksumProvider;
+		}
+	}
+
 	public ChecksumRecorder(ChecksumProvider checksumProvider)
 	{
 		_checksumProvider = checksumProvider;

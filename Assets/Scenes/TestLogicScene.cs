@@ -2,6 +2,123 @@
 using System.Collections.Generic;
 using System.Text;
 
+public class Replay
+{
+	readonly GameFixedUpdate _gameFixedUpdate;
+
+	readonly CommandsRecorder _commandsRecorder;
+
+	readonly RecorderView _recorderView;
+
+	readonly ChecksumRecorder _checksumRecorder;
+
+	readonly CommandsList _commandsList;
+
+	ChecksumValidator _checksumValidator;
+
+	bool _recording;
+
+	int gameFramesPerChecksumCheck = 10;
+
+	int _lastRecordedGameFrame; 
+
+	public int GameFramesPerChecksumCheck {
+		get {
+			return gameFramesPerChecksumCheck;
+		}
+		set {
+			gameFramesPerChecksumCheck = value;
+		}
+	}
+
+	public bool IsRecording
+	{
+		get {
+			return _recording;
+		}
+	}
+
+	public Replay(GameFixedUpdate gameFixedUpdate, ChecksumRecorder checksumRecorder, RecorderView recorderView, CommandsList commandsList)
+	{
+		_recording = true;
+		_lastRecordedGameFrame = 0;
+		_commandsRecorder = new CommandsRecorder ();
+		_checksumRecorder = checksumRecorder;
+		_gameFixedUpdate = gameFixedUpdate;
+		_recorderView = recorderView;
+		_commandsList = commandsList;
+	}
+
+	public void StartPlayback()
+	{
+		_recording = false;
+
+		_recorderView.StartPlayback ();
+
+		_checksumValidator = new ChecksumValidatorBasic (_checksumRecorder.StoredChecksums);
+	}
+
+	public void StartRecording()
+	{
+		_recording = true;
+		_recorderView.StartRecording();
+
+		_checksumRecorder.Reset ();
+	}
+
+	public void RecordCommands()
+	{
+		List<Command> commands = _commandsList.Commands;
+		for (int i = 0; i < commands.Count; i++) {
+			var command = commands [i];
+			_commandsRecorder.AddCommand (_gameFixedUpdate.GameTime, _gameFixedUpdate.CurrentGameFrame, command);
+		}
+	}
+
+	public bool IsFinished()
+	{
+		return _lastRecordedGameFrame == _gameFixedUpdate.CurrentGameFrame;
+	}
+
+	public void ReplayCommands()
+	{
+		List<Command> recordedCommands = new List<Command> ();
+
+		_commandsRecorder.GetCommandsForFrame(_gameFixedUpdate.CurrentGameFrame, recordedCommands);
+
+		for (int i = 0; i < recordedCommands.Count; i++) {
+			var command = recordedCommands [i];
+			_commandsList.AddCommand (command);
+		}
+
+		_commandsList.IsReady = true;
+	}
+
+	bool IsChecksumFrame(int frame)
+	{
+		return (frame % gameFramesPerChecksumCheck) == 0;
+	}
+
+	public void Update(int frame)
+	{
+		ChecksumProvider checksumProvider = _checksumRecorder.ChecksumProvider;
+
+		if (IsChecksumFrame(frame)) {
+			if (!_recording && _checksumValidator != null) {
+				bool validState = _checksumValidator.IsValid (frame, checksumProvider.CalculateChecksum ());
+				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
+			} else {
+				_checksumRecorder.RecordState (frame);
+			}
+		}
+
+		if (_recording) {
+			_lastRecordedGameFrame = _gameFixedUpdate.CurrentGameFrame;
+		}
+	}
+
+}
+
 public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	public class MoveCommand : Command
@@ -22,10 +139,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		}
 	}
 
-//	public class Replay
-//	{
-//		
-//	}
+
 
 	LockstepFixedUpdate gameFixedUpdate;
 
@@ -40,14 +154,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	public FeedbackClick feedbackClick;
 
-	CommandsRecorder _commandsRecorder;
-	bool _recording;
-
 	public RecorderView recorderView;
 
-	ChecksumRecorder _checksumRecorder;
-
-	ChecksumValidator _checksumValidator;
+	Replay _replay;
 
 	public int gameFramesPerChecksumCheck = 10;
 
@@ -65,18 +174,14 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	#endregion
 
-	ChecksumProvider _checksumProvider;
-
 	void Awake()
 	{
-		_commandsRecorder = new CommandsRecorder ();
-
-		_checksumProvider = new GameStateChecksumProvider (this);
-
-		_checksumRecorder = new ChecksumRecorder (_checksumProvider);
+		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (this));
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
-		checksumRecorderDebug.checksumRecorder = _checksumRecorder;
+		checksumRecorderDebug.checksumRecorder = checksumRecorder;
+
+		// TODO: set replay....
 
 		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
@@ -84,6 +189,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 		gameFixedUpdate.Init ();
 		gameFixedUpdate.SetGameLogic (this);
+
+		_replay = new Replay (gameFixedUpdate, checksumRecorder, recorderView, commandList);
+		_replay.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
 
 		StartRecording ();
 
@@ -100,25 +208,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		unit.SetPosition (new Vector2 (0, 0));
 	}
 
-	void StartPlayback()
-	{
-		_commandsRecorder.lastGameFrame = gameFixedUpdate.CurrentGameFrame;
-		_recording = false;
-
-		// resets game fixed update state...
-		ResetGameState();
-
-		recorderView.StartPlayback ();
-
-		_checksumValidator = new ChecksumValidatorBasic (_checksumRecorder.StoredChecksums);
-	}
-
 	void StartRecording()
 	{
-		_recording = true;
-		recorderView.StartRecording();
-
-		_checksumRecorder.Reset ();
+		_replay.StartRecording ();
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.GetComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.Reset ();
@@ -131,7 +223,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 	
 		if (Input.GetKeyUp (KeyCode.P)) {
-			StartPlayback ();
+
+			ResetGameState ();
+			_replay.StartPlayback ();
 
 			return;
 		}
@@ -144,7 +238,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 			return;
 		}
 
-		if (_recording) {
+		if (_replay.IsRecording) {
 
 			gameFixedUpdate.Update (Time.deltaTime);
 
@@ -155,7 +249,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 				commandList.AddCommand (moveCommand);
 				feedbackClick.ShowFeedback (position);
 
-				_commandsRecorder.AddCommand (gameFixedUpdate.GameTime, gameFixedUpdate.CurrentGameFrame, moveCommand);
+				_replay.RecordCommands ();
+
+//				_commandsRecorder.AddCommand (gameFixedUpdate.GameTime, gameFixedUpdate.CurrentGameFrame, moveCommand);
 			}
 
 			if (Input.touchCount > 0) {
@@ -166,7 +262,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 					commandList.AddCommand (moveCommand);			
 					feedbackClick.ShowFeedback (position);
 
-					_commandsRecorder.AddCommand (gameFixedUpdate.GameTime, gameFixedUpdate.CurrentGameFrame, moveCommand);
+					_replay.RecordCommands ();
+
+//					_commandsRecorder.AddCommand (gameFixedUpdate.GameTime, gameFixedUpdate.CurrentGameFrame, moveCommand);
 				}
 
 			}
@@ -177,44 +275,22 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 			// playback...
 
 			// if already at last frame, then dont update anymore...
-			if (_commandsRecorder.lastGameFrame == gameFixedUpdate.CurrentGameFrame)
+			if (_replay.IsFinished())
 				return;
 
 			gameFixedUpdate.Update (Time.deltaTime);
 
-			List<Command> recordedCommands = new List<Command> ();
-
-			_commandsRecorder.GetCommandsForFrame(gameFixedUpdate.CurrentGameFrame, recordedCommands);
-
-			for (int i = 0; i < recordedCommands.Count; i++) {
-				var command = recordedCommands [i];
-				commandList.AddCommand (command);
-			}
-
-			commandList.IsReady = true;
-				
+			_replay.ReplayCommands ();
 		}
 	}
 
 	#region DeterministicGameLogic implementation
 
-	bool IsChecksumFrame(int frame)
-	{
-		return (frame % gameFramesPerChecksumCheck) == 0;
-	}
-
 	public void Update (float dt, int frame)
 	{
 		// Debug.Log ("Timestep: " + frame);
 
-		if (IsChecksumFrame(frame)) {
-			if (!_recording && _checksumValidator != null) {
-				bool validState = _checksumValidator.IsValid (frame, _checksumProvider.CalculateChecksum ());
-				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
-			} else {
-				_checksumRecorder.RecordState (frame);
-			}
-		}
+		_replay.Update (frame);
 
 		// update game state...
 		unit.GameUpdate (dt, frame);
