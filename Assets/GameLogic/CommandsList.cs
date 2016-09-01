@@ -1,14 +1,8 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 public class CommandsList
 {
 	readonly List<Command> _commands = new List<Command>();
-
-//	public bool IsReady {
-//		get;
-//		set;
-//	}
 
 	public List<Command> Commands {
 		get {
@@ -33,7 +27,6 @@ public class CommandsList
 	{
 		for (int i = 0; i < commands.Count; i++) {
 			var command = commands [i];
-			Debug.Log ("removing command " + command.ProcessFrame);
 			_commands.Remove (command);
 		}
 	}
@@ -56,17 +49,12 @@ public class CommandsListLockstepLogic : LockstepLogic
 		_commandsList.GetCommands (frame, frameCommands);
 
 		return frameCommands.Count > 0;
-
-//		return _commandsList.Commands.Count > 0;
-//		return _commandsList.IsReady;
 	}
 
 	readonly List<Command> frameCommands = new List<Command>();
 
 	public void Process (int frame)
 	{
-		Debug.Log ("processing frame " + frame);
-
 		frameCommands.Clear ();
 		_commandsList.GetCommands (frame, frameCommands);
 
@@ -76,7 +64,6 @@ public class CommandsListLockstepLogic : LockstepLogic
 		}
 
 		_commandsList.RemoveCommands (frameCommands);
-		 // _commandsList.IsReady = false;
 
 		frameCommands.Clear ();
 	}
