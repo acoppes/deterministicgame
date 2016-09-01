@@ -28,6 +28,8 @@ public class LockstepFixedUpdate : GameFixedUpdate
 				return;
 
 			ProcessLockstepLogic ();
+			// Don't process same lockstep twice
+			_lastLockstepTurn = CurrentGameFrame;
 		}
 
 		// performs basic update logic...
@@ -40,9 +42,13 @@ public class LockstepFixedUpdate : GameFixedUpdate
 		return _lockstepLogic.IsReady(CurrentGameFrame);
 	}
 
+	int _lastLockstepTurn;
+
 	public bool IsLockstepTurn() 
 	{
 		if (CurrentGameFrame == 0)
+			return false;
+		if (CurrentGameFrame == _lastLockstepTurn)
 			return false;
 		return (CurrentGameFrame % GameFramesPerLockstep) == 0;
 	}

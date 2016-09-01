@@ -13,10 +13,11 @@ public class TestLockstepLogic {
 		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
 
 		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+		lockstepGameLogic.FixedStepTime = 0.1f;
 		lockstepGameLogic.GameFramesPerLockstep = 1;
 		lockstepGameLogic.SetGameLogic (gameLogic);
 
-		lockstepLogic.IsReady (0).Returns (false);
+		lockstepLogic.IsReady (0).ReturnsForAnyArgs (false);
 
 //		LockstepGameLogic lockstepGameLogic = new LockstepGameLogic (gameLogic, pendingCommands);
 
@@ -28,7 +29,7 @@ public class TestLockstepLogic {
 
 		Assert.That (gameLogic.lastFrame, Is.EqualTo (0));
 
-		lockstepLogic.IsReady (0).Returns (true);
+		lockstepLogic.IsReady (0).ReturnsForAnyArgs (true);
 
 		lockstepGameLogic.Update (0.1f);
 
@@ -59,6 +60,30 @@ public class TestLockstepLogic {
 		Assert.That (lockstepGameLogic.GetNextLockstepFrame (5), Is.EqualTo (12));
 		Assert.That (lockstepGameLogic.GetNextLockstepFrame (6), Is.EqualTo (12));
 		Assert.That (lockstepGameLogic.GetNextLockstepFrame (8), Is.EqualTo (16));
+	}
+
+	[Test]
+	public void LockstepLogicShouldNotProcessAgainIfNoFixedGameStep(){
+
+		var gameLogic = new TestGameStep.GameStepEngineMock ();
+
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
+
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+		lockstepGameLogic.FixedStepTime = 0.1f;
+		lockstepGameLogic.GameFramesPerLockstep = 2;
+		lockstepGameLogic.SetGameLogic (gameLogic);
+
+		lockstepLogic.IsReady (0).ReturnsForAnyArgs (true);
+
+		lockstepGameLogic.Update (0.1f);
+		lockstepGameLogic.Update (0.1f);
+
+		Assert.That (lockstepGameLogic.IsLockstepTurn(), Is.True);
+
+		lockstepGameLogic.Update (0.002f);
+
+		Assert.That (lockstepGameLogic.IsLockstepTurn(), Is.False);
 	}
 		
 }
