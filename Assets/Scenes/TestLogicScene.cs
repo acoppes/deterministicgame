@@ -154,7 +154,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	LockstepFixedUpdate gameFixedUpdate;
 
-	CommandsList commandList = new CommandsList();
+	CommandsList commandList;
 
 	public Unit unit;
 
@@ -187,6 +187,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	void Awake()
 	{
+		commandList = new CommandsList();
+
 		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (this));
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
@@ -268,11 +270,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 			if (Input.GetMouseButtonUp (1)) {
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
 			
-				var moveCommand = new MoveCommand (unit, position) {
-					ProcessFrame = gameFixedUpdate.GetNextLockstepFrame()	
-				};
+				AddCommand (new MoveCommand (unit, position));
 
-				commandList.AddCommand (moveCommand);
 				feedbackClick.ShowFeedback (position);
 
 				_replay.RecordCommands ();
@@ -283,11 +282,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 				if (Input.GetTouch (0).phase == TouchPhase.Ended) {
 					Vector2 position = camera.ScreenToWorldPoint (Input.GetTouch (0).position);
 
-					var moveCommand = new MoveCommand (unit, position) {
-						ProcessFrame = gameFixedUpdate.GetNextLockstepFrame()
-					};
+					AddCommand (new MoveCommand (unit, position));
 
-					commandList.AddCommand (moveCommand);			
 					feedbackClick.ShowFeedback (position);
 
 					_replay.RecordCommands ();
@@ -308,6 +304,16 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 			_replay.ReplayCommands ();
 		}
+	}
+
+	void AddCommand(Command command)
+	{
+		command.CreationFrame = gameFixedUpdate.CurrentGameFrame;
+
+		// to be processed in the next commands frame (next lockstep frame)
+		command.ProcessFrame = gameFixedUpdate.GetNextLockstepFrame ();
+
+		commandList.AddCommand (command);
 	}
 
 	#region DeterministicGameLogic implementation

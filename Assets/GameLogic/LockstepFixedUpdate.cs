@@ -58,7 +58,7 @@ public class LockstepFixedUpdate : GameFixedUpdate
 
 	public int GetNextLockstepFrame(int currentFrame)
 	{
-		int d = (currentFrame / GameFramesPerLockstep) + 1;
+		int d = (currentFrame / GameFramesPerLockstep) + 2;
 		return GameFramesPerLockstep * d;
 	}
 }
