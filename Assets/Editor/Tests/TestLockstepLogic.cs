@@ -16,7 +16,7 @@ public class TestLockstepLogic {
 		lockstepGameLogic.GameFramesPerLockstep = 1;
 		lockstepGameLogic.SetGameLogic (gameLogic);
 
-		lockstepLogic.IsReady ().Returns (false);
+		lockstepLogic.IsReady (0).Returns (false);
 
 //		LockstepGameLogic lockstepGameLogic = new LockstepGameLogic (gameLogic, pendingCommands);
 
@@ -28,7 +28,7 @@ public class TestLockstepLogic {
 
 		Assert.That (gameLogic.lastFrame, Is.EqualTo (0));
 
-		lockstepLogic.IsReady ().Returns (true);
+		lockstepLogic.IsReady (0).Returns (true);
 
 		lockstepGameLogic.Update (0.1f);
 
@@ -50,7 +50,7 @@ public class TestLockstepLogic {
 
 		lockstepGameLogic.SetGameLogic (gameLogic);
 
-		lockstepLogic.IsReady ().Returns (true);
+		lockstepLogic.IsReady (0).Returns (true);
 
 		Assert.That (lockstepGameLogic.GetNextLockstepFrame (0), Is.EqualTo (8));
 		Assert.That (lockstepGameLogic.GetNextLockstepFrame (1), Is.EqualTo (8));

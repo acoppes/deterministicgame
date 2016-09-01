@@ -4,10 +4,10 @@ public class CommandsList
 {
 	readonly List<Command> _commands = new List<Command>();
 
-	public bool IsReady {
-		get;
-		set;
-	}
+//	public bool IsReady {
+//		get;
+//		set;
+//	}
 
 	public List<Command> Commands {
 		get {
@@ -48,9 +48,14 @@ public class CommandsListLockstepLogic : LockstepLogic
 
 	#region LockstepLogic implementation
 
-	public bool IsReady ()
+	public bool IsReady (int frame)
 	{
-		return _commandsList.IsReady;
+		_commandsList.GetCommands (frame, frameCommands);
+
+		return frameCommands.Count > 0;
+
+//		return _commandsList.Commands.Count > 0;
+//		return _commandsList.IsReady;
 	}
 
 	readonly List<Command> frameCommands = new List<Command>();
@@ -65,7 +70,7 @@ public class CommandsListLockstepLogic : LockstepLogic
 		}
 
 		_commandsList.RemoveCommands (frameCommands);
-		_commandsList.IsReady = false;
+		 // _commandsList.IsReady = false;
 
 		frameCommands.Clear ();
 	}

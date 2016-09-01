@@ -101,7 +101,7 @@ public class Replay
 			_commandsList.AddCommand (command);
 		}
 
-		_commandsList.IsReady = true;
+		// _commandsList.IsReady = true;
 	}
 
 	bool IsChecksumFrame(int frame)
@@ -199,9 +199,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
-
-		gameFixedUpdate.Init ();
 		gameFixedUpdate.SetGameLogic (this);
+
+		ResetGameState ();
 
 		_replay = new Replay (gameFixedUpdate, checksumRecorder, recorderView, commandList);
 		_replay.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
@@ -213,12 +213,23 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
 
 		Application.targetFrameRate = 60;
+
+//		commandList.AddCommand (new Command () {
+//			CreationFrame = 0,
+//			ProcessFrame = gameFixedUpdate.GetFirstLockstepFrame()
+//		});
 	}
 
 	void ResetGameState()
 	{
 		gameFixedUpdate.Init ();
 		unit.SetPosition (new Vector2 (0, 0));
+
+		// by default enqueues an empty command for first lockstep frame
+		commandList.AddCommand (new Command () {
+			CreationFrame = 0,
+			ProcessFrame = gameFixedUpdate.GetFirstLockstepFrame()
+		});
 	}
 
 	public void ToggleRecording()
@@ -291,7 +302,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 			}
 
-			commandList.IsReady = true;
+		//	commandList.IsReady = true;
 		} else {
 		
 			// playback...
@@ -321,6 +332,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 	public void Update (float dt, int frame)
 	{
 		// Debug.Log ("Timestep: " + frame);
+
+		// add empty command each fixed step just in case...
+		AddCommand(new Command());
 
 		_replay.Update (frame);
 
