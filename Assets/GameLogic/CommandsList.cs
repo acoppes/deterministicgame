@@ -70,5 +70,21 @@ public class CommandsListLockstepLogic : LockstepLogic
 		frameCommands.Clear ();
 	}
 	#endregion
-	
+
+//	public int LockstepFrames {
+//		get;
+//		set;
+//	}
+//
+//	int _communicationsDelayInFrames;
+//
+//	public void SetCommunicationsDelayInFrames(int communicationsDelayInFrames)
+//	{
+//		_communicationsDelayInFrames = communicationsDelayInFrames;
+//	}
+//
+//	public int GetCommandProcessFrame(int frame)
+//	{
+//		return frame + _communicationsDelayInFrames;
+//	}
 }

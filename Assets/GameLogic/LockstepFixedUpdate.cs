@@ -8,8 +8,6 @@ public interface LockstepLogic
 
 public class LockstepFixedUpdate : GameFixedUpdate
 {
-	int _gameFramesPerLockstep;
-
 	readonly LockstepLogic _lockstepLogic;
 
 	public LockstepFixedUpdate(LockstepLogic lockstepLogic)
@@ -18,12 +16,8 @@ public class LockstepFixedUpdate : GameFixedUpdate
 	}
 
 	public int GameFramesPerLockstep {
-		get {
-			return _gameFramesPerLockstep;
-		}
-		set {
-			_gameFramesPerLockstep = value;
-		}
+		get;
+		set;
 	}
 
 	public override void Update (float dt)
@@ -48,7 +42,7 @@ public class LockstepFixedUpdate : GameFixedUpdate
 
 	bool IsLockstepTurn() 
 	{
-		return (CurrentGameFrame % _gameFramesPerLockstep) == 0;
+		return (CurrentGameFrame % GameFramesPerLockstep) == 0;
 	}
 
 	void ProcessLockstepLogic()
@@ -59,7 +53,12 @@ public class LockstepFixedUpdate : GameFixedUpdate
 
 	public int GetNextLockstepFrame ()
 	{
-		int d = (CurrentGameFrame / _gameFramesPerLockstep) + 1;
-		return _gameFramesPerLockstep * d;
+		return GetNextLockstepFrame (CurrentGameFrame);
+	}
+
+	public int GetNextLockstepFrame(int currentFrame)
+	{
+		int d = (currentFrame / GameFramesPerLockstep) + 1;
+		return GameFramesPerLockstep * d;
 	}
 }

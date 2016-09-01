@@ -267,6 +267,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 			if (Input.GetMouseButtonUp (1)) {
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
+			
 				var moveCommand = new MoveCommand (unit, position) {
 					ProcessFrame = gameFixedUpdate.GetNextLockstepFrame()	
 				};
