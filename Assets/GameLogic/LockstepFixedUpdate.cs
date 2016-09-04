@@ -1,77 +1,79 @@
-
-public interface LockstepLogic
+namespace Gemserk.Lockstep 
 {
-	bool IsReady(int frame);
-
-	void Process(int frame);
-}
-
-public class LockstepFixedUpdate : GameFixedUpdate
-{
-	readonly LockstepLogic _lockstepLogic;
-
-	public LockstepFixedUpdate(LockstepLogic lockstepLogic)
+	public interface LockstepLogic
 	{
-		_lockstepLogic = lockstepLogic;
+		bool IsReady(int frame);
+
+		void Process(int frame);
 	}
 
-	public int GameFramesPerLockstep {
-		get;
-		set;
-	}
-
-	public override void Update (float dt)
+	public class LockstepFixedUpdate : GameFixedUpdate
 	{
-		if (IsLockstepTurn ()) {
-		
-			if (!IsReady ())
-				return;
+		readonly LockstepLogic _lockstepLogic;
 
-			ProcessLockstepLogic ();
-			// Don't process same lockstep twice
-			_lastLockstepTurn = CurrentGameFrame;
+		public LockstepFixedUpdate(LockstepLogic lockstepLogic)
+		{
+			_lockstepLogic = lockstepLogic;
 		}
 
-		// performs basic update logic...
-		base.Update (dt);
-	}
+		public int GameFramesPerLockstep {
+			get;
+			set;
+		}
 
-	bool IsReady()
-	{
-		// check for pending actions...
-		return _lockstepLogic.IsReady(CurrentGameFrame);
-	}
+		public override void Update (float dt)
+		{
+			if (IsLockstepTurn ()) {
+			
+				if (!IsReady ())
+					return;
 
-	int _lastLockstepTurn;
+				ProcessLockstepLogic ();
+				// Don't process same lockstep twice
+				_lastLockstepTurn = CurrentGameFrame;
+			}
 
-	public bool IsLockstepTurn() 
-	{
-		if (CurrentGameFrame == 0)
-			return false;
-		if (CurrentGameFrame == _lastLockstepTurn)
-			return false;
-		return (CurrentGameFrame % GameFramesPerLockstep) == 0;
-	}
+			// performs basic update logic...
+			base.Update (dt);
+		}
 
-	void ProcessLockstepLogic()
-	{
-		// process pending actions..
-		_lockstepLogic.Process(CurrentGameFrame);
-	}
+		bool IsReady()
+		{
+			// check for pending actions...
+			return _lockstepLogic.IsReady(CurrentGameFrame);
+		}
 
-	public int GetFirstLockstepFrame()
-	{
-		return GameFramesPerLockstep;
-	}
+		int _lastLockstepTurn;
 
-	public int GetNextLockstepFrame ()
-	{
-		return GetNextLockstepFrame (CurrentGameFrame);
-	}
+		public bool IsLockstepTurn() 
+		{
+			if (CurrentGameFrame == 0)
+				return false;
+			if (CurrentGameFrame == _lastLockstepTurn)
+				return false;
+			return (CurrentGameFrame % GameFramesPerLockstep) == 0;
+		}
 
-	public int GetNextLockstepFrame(int currentFrame)
-	{
-		int d = (currentFrame / GameFramesPerLockstep) + 2;
-		return GameFramesPerLockstep * d;
+		void ProcessLockstepLogic()
+		{
+			// process pending actions..
+			_lockstepLogic.Process(CurrentGameFrame);
+		}
+
+		public int GetFirstLockstepFrame()
+		{
+			return GameFramesPerLockstep;
+		}
+
+		public int GetNextLockstepFrame ()
+		{
+			return GetNextLockstepFrame (CurrentGameFrame);
+		}
+
+		public int GetNextLockstepFrame(int currentFrame)
+		{
+			int d = (currentFrame / GameFramesPerLockstep) + 2;
+			return GameFramesPerLockstep * d;
+		}
 	}
 }

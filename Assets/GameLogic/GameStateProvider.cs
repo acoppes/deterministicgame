@@ -1,25 +1,27 @@
-
-public interface GameStateProvider
+namespace Gemserk.Lockstep 
 {
-	string GetGameState();
-}
-
-public class GameStateChecksumProvider : ChecksumProvider
-{
-	readonly GameStateProvider _gameStateProvider;
-
-	public GameStateChecksumProvider(GameStateProvider gameStateProvider)
+	public interface GameStateProvider
 	{
-		_gameStateProvider = gameStateProvider;
+		string GetGameState();
 	}
 
-	#region ChecksumProvider implementation
-
-	public Checksum CalculateChecksum ()
+	public class GameStateChecksumProvider : ChecksumProvider
 	{
-		return new ChecksumString(ChecksumHelper.CalculateMD5(_gameStateProvider.GetGameState()));
+		readonly GameStateProvider _gameStateProvider;
+
+		public GameStateChecksumProvider(GameStateProvider gameStateProvider)
+		{
+			_gameStateProvider = gameStateProvider;
+		}
+
+		#region ChecksumProvider implementation
+
+		public Checksum CalculateChecksum ()
+		{
+			return new ChecksumString(ChecksumHelper.CalculateMD5(_gameStateProvider.GetGameState()));
+		}
+
+		#endregion
+
 	}
-
-	#endregion
-
 }

@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using NSubstitute;
+using Gemserk.Lockstep;
 
 public class TestLockstepLogic {
 

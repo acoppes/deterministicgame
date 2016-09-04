@@ -1,17 +1,20 @@
-public class Command
+namespace Gemserk.Lockstep 
 {
-	public int CreationFrame 
+	public class Command
 	{
-		get; set;
-	}
+		public int CreationFrame 
+		{
+			get; set;
+		}
 
-	public int ProcessFrame 
-	{
-		get; set;
-	}
+		public int ProcessFrame 
+		{
+			get; set;
+		}
 
-	public virtual void Process()
-	{
-		
+		public virtual void Process()
+		{
+			
+		}
 	}
 }

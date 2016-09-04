@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
-using NSubstitute;
 using System.Collections.Generic;
+using Gemserk.Lockstep;
 
 
 public class TestChecksumValidator {

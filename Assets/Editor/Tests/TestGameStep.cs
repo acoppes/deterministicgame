@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Gemserk.Lockstep;
 
 public class TestGameStep {
 
