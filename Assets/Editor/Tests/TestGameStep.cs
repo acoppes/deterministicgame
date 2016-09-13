@@ -9,7 +9,7 @@ public class TestGameStep {
 		public int lastFrame;
 
 		#region GameStepEngine implementation
-		public void Update (float dt, int frame)
+		public void GameUpdate (float dt, int frame)
 		{
 			lastDt = dt;
 			lastFrame = frame;

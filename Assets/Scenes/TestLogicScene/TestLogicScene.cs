@@ -330,7 +330,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	#region DeterministicGameLogic implementation
 
-	public void Update (float dt, int frame)
+	public void GameUpdate (float dt, int frame)
 	{
 		// Debug.Log ("Timestep: " + frame);
 

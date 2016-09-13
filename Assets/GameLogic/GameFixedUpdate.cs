@@ -60,7 +60,7 @@
 
 			while (_accumulatedTime >= _fixedStepTime) {
 				if (_gameLogic != null)
-					_gameLogic.Update (_fixedStepTime, _currentGameFrame);
+					_gameLogic.GameUpdate (_fixedStepTime, _currentGameFrame);
 				_currentGameFrame++;
 				_accumulatedTime -= _fixedStepTime;
 			}

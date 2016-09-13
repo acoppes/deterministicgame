@@ -23,14 +23,8 @@ public class NetworkSamplePlayer : NetworkBehaviour {
 
 		if (Input.GetMouseButtonUp (0)) {
 			Vector2 position = myCamera.ScreenToWorldPoint (Input.mousePosition);
-			CmdMoveTo (position);
+			movement.CmdMoveTo (position);
 		}
-	}
-		
-	[Command]
-	public void CmdMoveTo(Vector2 position)
-	{
-		movement.MoveTo (position);
 	}
 
 }

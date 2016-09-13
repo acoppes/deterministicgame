@@ -18,17 +18,8 @@ public class NetworkSampleMovement : NetworkBehaviour {
 		_moving = false;
 	}
 
-	public void SetPosition(Vector2 position)
-	{
-		transform.position = position;
-
-		_gamePosition = transform.position;
-
-		_destination = _gamePosition;
-		_moving = false;
-	}
-
-	public void MoveTo(Vector2 destination)
+	[Command]
+	public void CmdMoveTo(Vector2 destination)
 	{
 		_destination = destination;
 		_moving = true;

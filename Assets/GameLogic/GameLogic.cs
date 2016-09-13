@@ -2,6 +2,6 @@ namespace Gemserk.Lockstep
 {
 	public interface GameLogic
 	{
-		void Update (float dt, int frame);
+		void GameUpdate (float dt, int frame);
 	}
 }
