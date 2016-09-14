@@ -1,7 +1,5 @@
 using NUnit.Framework;
-using NSubstitute;
 using Gemserk.Lockstep;
-using System.Text;
 
 public class TestObject : GameStateProvider
 {
@@ -9,9 +7,10 @@ public class TestObject : GameStateProvider
 	public void Provide (GameState gameState)
 	{
 		gameState.SetInt (10);
+		gameState.SetInt (5);
+		gameState.SetInt (20);
 	}
 	#endregion
-	
 }
 
 public class TestGameStateProvider {
@@ -19,10 +18,14 @@ public class TestGameStateProvider {
 	[Test]
 	public void TestGameStateProvider1(){
 
-		GameState gameState = new GameStateStringBuilderImpl ();
+		GameStateStringBuilderImpl gameState = new GameStateStringBuilderImpl ();
 		TestObject testObject = new TestObject ();
 
+		gameState.Reset ();
 		testObject.Provide (gameState);
+
+		string state = gameState.State;
+		Assert.That (state, Is.EqualTo ("10520"));
 	}
 
 }

@@ -135,10 +135,10 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	public class MoveCommand : Command
 	{
-		Unit unit;
+		UnitBehaviour unit;
 		Vector2 destination;
 
-		public MoveCommand(Unit unit, Vector2 destination)
+		public MoveCommand(UnitBehaviour unit, Vector2 destination)
 		{
 			this.unit = unit;
 			this.destination = destination;
@@ -147,7 +147,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		public override void Process ()
 		{
 			base.Process ();
-			unit.MoveTo (destination);
+			unit.Unit.MoveTo (destination);
 		}
 	}
 		
@@ -155,7 +155,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	CommandsList commandList;
 
-	public Unit unit;
+	public UnitBehaviour unit;
 
 	public int fixedTimestepMilliseconds = 100;
 	public int gameFramesPerLockstep = 4;
@@ -177,7 +177,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 	public void Provide (GameState gameState)
 	{
 		gameState.SetInt (gameFixedUpdate.CurrentGameFrame);
-		unit.UnitImpl.Provide (gameState);
+		unit.Unit.Provide (gameState);
 	}
 
 	#endregion
@@ -339,7 +339,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		_replay.Update (frame);
 
 		// update game state...
-		unit.UnitImpl.GameUpdate (dt, frame);
+		unit.Unit.GameUpdate (dt, frame);
 	}
 
 	#endregion

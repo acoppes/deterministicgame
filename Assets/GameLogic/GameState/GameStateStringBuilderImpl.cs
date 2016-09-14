@@ -6,6 +6,12 @@ namespace Gemserk.Lockstep
 	{
 		StringBuilder state = new StringBuilder();
 
+		public string State {
+			get {
+				return state.ToString();
+			}
+		}
+
 		#region ChecksumProvider implementation
 		public Checksum CalculateChecksum ()
 		{

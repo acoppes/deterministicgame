@@ -1,43 +1,7 @@
-﻿using UnityEngine;
-using System.Text;
+using UnityEngine;
 using Gemserk.Lockstep;
 
-public class PositionInterpolator
-{
-	Vector2 _p0;
-	Vector2 _p1;
-	Vector2 _currentPosition;
-
-	float _accumulatedDt;
-
-	float _totalTime;
-
-	public void SetPosition (float time, Vector2 position)
-	{
-		_p0 = position;
-		_p1 = position;
-	}
-
-	public void UpdatePosition(float time, Vector2 position) 
-	{
-		_p0 = _currentPosition;
-		_p1 = position;
-
-		// _accumulatedDt -= time;
-		_accumulatedDt = 0;
-		_totalTime = time;
-	}
-
-	public Vector2 GetCurrentPosition(float dt)
-	{
-		_accumulatedDt += dt;
-		_currentPosition = Vector2.Lerp (_p0, _p1, _accumulatedDt / _totalTime);
-		return _currentPosition;
-	}
-
-}
-	
-public class UnitImpl : GameLogic, GameStateProvider
+public class Unit : GameLogic, GameStateProvider
 {
 	Vector2 _gamePosition;
 
@@ -49,7 +13,7 @@ public class UnitImpl : GameLogic, GameStateProvider
 
 	bool _moving = false;
 
-	PositionInterpolator unitView;
+	readonly PositionInterpolator positionInterpolator;
 
 	public Vector2 Position {
 		get {
@@ -65,7 +29,7 @@ public class UnitImpl : GameLogic, GameStateProvider
 
 	public PositionInterpolator UnitView {
 		get {
-			return unitView;
+			return positionInterpolator;
 		}
 	}
 
@@ -92,12 +56,12 @@ public class UnitImpl : GameLogic, GameStateProvider
 
 	#endregion
 
-	public UnitImpl(Vector2 position)
+	public Unit(Vector2 position)
 	{
 		_gamePosition = position;
 
-		unitView = new PositionInterpolator ();
-		unitView.SetPosition (0, _gamePosition);
+		positionInterpolator = new PositionInterpolator ();
+		positionInterpolator.SetPosition (0, _gamePosition);
 
 		_destination = _gamePosition;
 		_moving = false;
@@ -108,7 +72,7 @@ public class UnitImpl : GameLogic, GameStateProvider
 		_gamePosition = position;
 		_lastGamePosition = _gamePosition;
 
-		unitView.SetPosition (0, _gamePosition);
+		positionInterpolator.SetPosition (0, _gamePosition);
 
 		_destination = _gamePosition;
 		_moving = false;
@@ -140,62 +104,7 @@ public class UnitImpl : GameLogic, GameStateProvider
 
 		_gamePosition = newPosition;
 
-		unitView.UpdatePosition (dt, _gamePosition);
-	}
-
-}
-
-public class Unit : MonoBehaviour {
-
-	UnitImpl unitImpl;
-
-	public bool interpolationEnabled = true;
-
-	public UnitImpl UnitImpl {
-		get {
-			return unitImpl;
-		}
-	}
-
-	public float speed = 1.0f;
-
-	void Awake()
-	{
-		unitImpl = new UnitImpl (transform.position);
-	}
-
-	public void SetPosition(Vector2 position)
-	{
-		transform.position = position;
-		unitImpl.SetPosition (position);
-	}
-
-	public void MoveTo(Vector2 destination)
-	{
-		unitImpl.MoveTo (destination);
-	}
-
-	void LateUpdate()
-	{
-		unitImpl.Speed = this.speed;
-
-		if (interpolationEnabled) {
-			transform.position = unitImpl.UnitView.GetCurrentPosition (Time.deltaTime);
-		} else {
-			transform.position = unitImpl.Position;
-		}
-	}
-
-	void OnDrawGizmos()
-	{
-		if (unitImpl == null)
-			return;
-		
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere (unitImpl.PreviousPosition, 0.2f);
-
-		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere (unitImpl.Position, 0.2f);
+		positionInterpolator.UpdatePosition (dt, _gamePosition);
 	}
 
 }

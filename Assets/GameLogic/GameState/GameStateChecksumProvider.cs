@@ -1,4 +1,3 @@
-
 namespace Gemserk.Lockstep 
 {
 	public class GameStateChecksumProvider : ChecksumProvider
@@ -21,7 +20,6 @@ namespace Gemserk.Lockstep
 			_gameStateProvider.Provide (_gameState);
 
 			return _gameState.CalculateChecksum ();
-//			return new ChecksumString(ChecksumHelper.CalculateMD5(_gameStateProvider.GetGameState()));
 		}
 
 		#endregion
