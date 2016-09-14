@@ -223,7 +223,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 	void ResetGameState()
 	{
 		gameFixedUpdate.Init ();
-		unit.SetPosition (new Vector2 (0, 0));
+		unit.Unit.SetPosition (new Vector2 (0, 0));
 
 		// by default enqueues an empty command for first lockstep frame
 		commandList.AddCommand (new Command () {

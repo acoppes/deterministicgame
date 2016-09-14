@@ -19,12 +19,6 @@ public class UnitBehaviour : MonoBehaviour {
 		unit = new Unit (transform.position);
 	}
 
-	public void SetPosition(Vector2 position)
-	{
-		transform.position = position;
-		unit.SetPosition (position);
-	}
-
 	void LateUpdate()
 	{
 		unit.Speed = this.speed;
