@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Text;
+using Gemserk.Lockstep;
 
-public class UnitView
+public class PositionInterpolator
 {
 	Vector2 _p0;
 	Vector2 _p1;
@@ -36,21 +37,51 @@ public class UnitView
 
 }
 
-public class Unit : MonoBehaviour {
+//public interface GameStateProvider 
+//{
+//	
+//}
 
+public class UnitImpl : GameLogic
+{
 	Vector2 _gamePosition;
 
 	Vector2 _destination;
 
-	Vector2 _debugLastGamePosition;
+	Vector2 _lastGamePosition;
 
-	public float speed = 1.0f;
-
-	public bool interpolationEnabled = true;
+	float speed = 1.0f;
 
 	bool _moving = false;
 
-	UnitView unitView;
+	PositionInterpolator unitView;
+
+	public Vector2 Position {
+		get {
+			return _gamePosition;
+		}
+	}
+
+	public Vector2 PreviousPosition {
+		get {
+			return _lastGamePosition;
+		}
+	}
+
+	public PositionInterpolator UnitView {
+		get {
+			return unitView;
+		}
+	}
+
+	public float Speed {
+		get {
+			return speed;
+		}
+		set {
+			speed = value;
+		}
+	}
 
 	// TODO: this is used for checksum, add interface for this
 	public void AddState(StringBuilder strBuilder)
@@ -63,12 +94,11 @@ public class Unit : MonoBehaviour {
 		strBuilder.Append (_destination.y);
 	}
 
-	void Awake()
+	public UnitImpl(Vector2 position)
 	{
-		_gamePosition = transform.position;
-		_debugLastGamePosition = _gamePosition;
+		_gamePosition = position;
 
-		unitView = new UnitView ();
+		unitView = new PositionInterpolator ();
 		unitView.SetPosition (0, _gamePosition);
 
 		_destination = _gamePosition;
@@ -77,10 +107,8 @@ public class Unit : MonoBehaviour {
 
 	public void SetPosition(Vector2 position)
 	{
-		transform.position = position;
-
-		_gamePosition = transform.position;
-		_debugLastGamePosition = _gamePosition;
+		_gamePosition = position;
+		_lastGamePosition = _gamePosition;
 
 		unitView.SetPosition (0, _gamePosition);
 
@@ -99,16 +127,16 @@ public class Unit : MonoBehaviour {
 		if (!_moving)
 			return;
 
-		_debugLastGamePosition = _gamePosition;
+		_lastGamePosition = _gamePosition;
 
 		Vector2 direction = (_destination - _gamePosition).normalized;
 
 		float realSpeed = speed * dt;
 
 		Vector2 newPosition = _gamePosition + direction * realSpeed;
-	
+
 		if ((_destination - newPosition).SqrMagnitude() < realSpeed * realSpeed) {
-//			newPosition = _destination;
+			//			newPosition = _destination;
 			_moving = false;
 		}
 
@@ -117,22 +145,59 @@ public class Unit : MonoBehaviour {
 		unitView.UpdatePosition (dt, _gamePosition);
 	}
 
+}
+
+public class Unit : MonoBehaviour {
+
+	UnitImpl unitImpl;
+
+	public bool interpolationEnabled = true;
+
+	public UnitImpl UnitImpl {
+		get {
+			return unitImpl;
+		}
+	}
+
+	public float speed = 1.0f;
+
+	void Awake()
+	{
+		unitImpl = new UnitImpl (transform.position);
+	}
+
+	public void SetPosition(Vector2 position)
+	{
+		transform.position = position;
+		unitImpl.SetPosition (position);
+	}
+
+	public void MoveTo(Vector2 destination)
+	{
+		unitImpl.MoveTo (destination);
+	}
+
 	void LateUpdate()
 	{
+		unitImpl.Speed = this.speed;
+
 		if (interpolationEnabled) {
-			transform.position = unitView.GetCurrentPosition (Time.deltaTime);
+			transform.position = unitImpl.UnitView.GetCurrentPosition (Time.deltaTime);
 		} else {
-			transform.position = _gamePosition;
+			transform.position = unitImpl.Position;
 		}
 	}
 
 	void OnDrawGizmos()
 	{
+		if (unitImpl == null)
+			return;
+		
 		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere (_debugLastGamePosition, 0.2f);
+		Gizmos.DrawWireSphere (unitImpl.PreviousPosition, 0.2f);
 
 		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere (_gamePosition, 0.2f);
+		Gizmos.DrawWireSphere (unitImpl.Position, 0.2f);
 	}
 
 }

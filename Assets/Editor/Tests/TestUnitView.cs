@@ -7,7 +7,7 @@ public class TestUnitView {
 	[Test]
 	public void TestUnitViewGetPosition()
 	{
-		UnitView unitView = new UnitView ();
+		PositionInterpolator unitView = new PositionInterpolator ();
 		unitView.SetPosition (0, new UnityEngine.Vector2 (0, 0));
 		unitView.UpdatePosition (1, new UnityEngine.Vector2 (100, 0));
 
@@ -17,7 +17,7 @@ public class TestUnitView {
 	[Test]
 	public void TestUnitViewGetPosition2()
 	{
-		UnitView unitView = new UnitView ();
+		PositionInterpolator unitView = new PositionInterpolator ();
 		unitView.SetPosition (0, new UnityEngine.Vector2 (0, 0));
 		unitView.UpdatePosition (1, new UnityEngine.Vector2 (100, 0));
 
@@ -29,7 +29,7 @@ public class TestUnitView {
 	[Test]
 	public void TestUnitViewGetPosition3()
 	{
-		UnitView unitView = new UnitView ();
+		PositionInterpolator unitView = new PositionInterpolator ();
 		unitView.SetPosition (0, new UnityEngine.Vector2 (0, 0));
 		unitView.UpdatePosition (1, new UnityEngine.Vector2 (100, 0));
 
@@ -41,7 +41,7 @@ public class TestUnitView {
 	[Test]
 	public void TestUnitViewGetPositionIncrementalDt()
 	{
-		UnitView unitView = new UnitView ();
+		PositionInterpolator unitView = new PositionInterpolator ();
 		unitView.SetPosition (0, new UnityEngine.Vector2 (0, 0));
 		unitView.UpdatePosition (1, new UnityEngine.Vector2 (100, -100));
 
@@ -54,7 +54,7 @@ public class TestUnitView {
 	[Test]
 	public void TestUnitViewGetPositionIncrementalDt2()
 	{
-		UnitView unitView = new UnitView ();
+		PositionInterpolator unitView = new PositionInterpolator ();
 		unitView.SetPosition (0, new UnityEngine.Vector2 (0, 0));
 		unitView.UpdatePosition (1, new UnityEngine.Vector2 (100, -100));
 
@@ -67,7 +67,7 @@ public class TestUnitView {
 	[Test]
 	public void TestUnitViewGetPositionIncrementalDt3()
 	{
-		UnitView unitView = new UnitView ();
+		PositionInterpolator unitView = new PositionInterpolator ();
 		unitView.SetPosition (0, new UnityEngine.Vector2 (0, 0));
 		unitView.UpdatePosition (0.05f, new UnityEngine.Vector2 (100, -100));
 

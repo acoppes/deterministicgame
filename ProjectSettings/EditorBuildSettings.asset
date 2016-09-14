@@ -7,5 +7,7 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 0
     path: Assets/Scenes/TestLogicScene.unity
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/NetworkingSample/NetworkingSample.unity
+  - enabled: 1
+    path: Assets/Scenes/TestLogicScene/TestLogicScene.unity

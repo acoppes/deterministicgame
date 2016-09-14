@@ -179,7 +179,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		StringBuilder strBuilder = new StringBuilder ();
 
 		strBuilder.Append(gameFixedUpdate.CurrentGameFrame);
-		unit.AddState (strBuilder);
+		unit.UnitImpl.AddState (strBuilder);
 
 		return strBuilder.ToString ();
 	}
@@ -340,7 +340,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 		_replay.Update (frame);
 
 		// update game state...
-		unit.GameUpdate (dt, frame);
+		unit.UnitImpl.GameUpdate (dt, frame);
 	}
 
 	#endregion
