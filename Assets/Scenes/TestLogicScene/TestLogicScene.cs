@@ -150,9 +150,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 			unit.MoveTo (destination);
 		}
 	}
-
-
-
+		
 	LockstepFixedUpdate gameFixedUpdate;
 
 	CommandsList commandList;
@@ -172,25 +170,26 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	public int gameFramesPerChecksumCheck = 10;
 
+	GameState gameState;
+
 	#region GameStateProvider implementation
 
-	public string GetGameState ()
+	public void Provide (GameState gameState)
 	{
-		StringBuilder strBuilder = new StringBuilder ();
-
-		strBuilder.Append(gameFixedUpdate.CurrentGameFrame);
-		unit.UnitImpl.AddState (strBuilder);
-
-		return strBuilder.ToString ();
+		gameState.SetInt (gameFixedUpdate.CurrentGameFrame);
+		unit.UnitImpl.Provide (gameState);
 	}
 
 	#endregion
 
+
 	void Awake()
 	{
+		gameState = new GameStateStringBuilderImpl ();
+
 		commandList = new CommandsList();
 
-		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (this));
+		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (gameState, this));
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = checksumRecorder;

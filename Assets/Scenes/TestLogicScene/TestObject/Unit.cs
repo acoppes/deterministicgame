@@ -36,13 +36,8 @@ public class PositionInterpolator
 	}
 
 }
-
-//public interface GameStateProvider 
-//{
-//	
-//}
-
-public class UnitImpl : GameLogic
+	
+public class UnitImpl : GameLogic, GameStateProvider
 {
 	Vector2 _gamePosition;
 
@@ -83,16 +78,19 @@ public class UnitImpl : GameLogic
 		}
 	}
 
-	// TODO: this is used for checksum, add interface for this
-	public void AddState(StringBuilder strBuilder)
+	#region GameStateProvider implementation
+
+	public void Provide (GameState gameState)
 	{
-		strBuilder.Append (_gamePosition.x);
-		strBuilder.Append (_gamePosition.y);
-		strBuilder.Append (speed);
-		strBuilder.Append (_moving);
-		strBuilder.Append (_destination.x);
-		strBuilder.Append (_destination.y);
+		gameState.SetFloat (_gamePosition.x);
+		gameState.SetFloat (_gamePosition.y);
+		gameState.SetFloat (speed);
+		gameState.SetBool (_moving);
+		gameState.SetFloat (_destination.x);
+		gameState.SetFloat (_destination.y);
 	}
+
+	#endregion
 
 	public UnitImpl(Vector2 position)
 	{
