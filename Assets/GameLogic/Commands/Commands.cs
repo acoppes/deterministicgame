@@ -6,6 +6,8 @@ namespace Gemserk.Lockstep
 	{
 		void AddCommand(Command command);
 
+		bool HasCommands(int frame);
+
 		void GetCommands(List<Command> commands);
 
 		void GetCommands(int frame, List<Command> commands);

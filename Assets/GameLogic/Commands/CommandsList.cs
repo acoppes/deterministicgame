@@ -19,6 +19,15 @@ namespace Gemserk.Lockstep
 			_commands.Add (command);
 		}
 
+		public bool HasCommands(int frame)
+		{
+			for (int i = 0; i < _commands.Count; i++) {
+				if (_commands [i].ProcessFrame == frame)
+					return true;
+			}
+			return false;
+		}
+
 		public void GetCommands(List<Command> commands)
 		{
 			for (int i = 0; i < _commands.Count; i++)
