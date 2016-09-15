@@ -11,10 +11,10 @@ namespace Gemserk.Lockstep
 		{
 			get; set;
 		}
+	}
 
-		public virtual void Process()
-		{
-			
-		}
+	public interface CommandProcessor
+	{
+		void Process(Command command, int frame);
 	}
 }

@@ -131,23 +131,15 @@ public class Replay
 
 }
 
-public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
+public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor {
 
 	public class MoveCommand : Command
 	{
-		UnitBehaviour unit;
-		Vector2 destination;
+		public Vector2 destination;
 
-		public MoveCommand(UnitBehaviour unit, Vector2 destination)
+		public MoveCommand(Vector2 destination)
 		{
-			this.unit = unit;
 			this.destination = destination;
-		}
-
-		public override void Process ()
-		{
-			base.Process ();
-			unit.Unit.MoveTo (destination);
 		}
 	}
 		
@@ -182,6 +174,19 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 	#endregion
 
+	#region CommandProcessor implementation
+
+	public void Process (Command command, int frame)
+	{
+		MoveCommand moveCommand = command as MoveCommand;
+
+		if (moveCommand != null) {
+			unit.Unit.MoveTo (moveCommand.destination);
+		}
+	}
+
+	#endregion
+
 
 	void Awake()
 	{
@@ -196,7 +201,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 
 		// TODO: set replay....
 
-		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList));
+		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList, this));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 		gameFixedUpdate.SetGameLogic (this);
@@ -281,7 +286,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 			if (Input.GetMouseButtonUp (1)) {
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
 			
-				AddCommand (new MoveCommand (unit, position));
+				AddCommand (new MoveCommand (position));
 
 				feedbackClick.ShowFeedback (position);
 
@@ -293,7 +298,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider {
 				if (Input.GetTouch (0).phase == TouchPhase.Ended) {
 					Vector2 position = camera.ScreenToWorldPoint (Input.GetTouch (0).position);
 
-					AddCommand (new MoveCommand (unit, position));
+					AddCommand (new MoveCommand (position));
 
 					feedbackClick.ShowFeedback (position);
 

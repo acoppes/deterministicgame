@@ -38,9 +38,12 @@ namespace Gemserk.Lockstep
 	{
 		readonly CommandsList _commandsList;
 
-		public CommandsListLockstepLogic(CommandsList commandsList)
+		CommandProcessor _commandProcessor;
+
+		public CommandsListLockstepLogic(CommandsList commandsList, CommandProcessor commandProcessor)
 		{
 			_commandsList = commandsList;
+			_commandProcessor = commandProcessor;
 		}
 
 		#region LockstepLogic implementation
@@ -62,7 +65,7 @@ namespace Gemserk.Lockstep
 
 			for (int i = 0; i < frameCommands.Count; i++) {
 				var command = frameCommands [i];
-				command.Process ();
+				_commandProcessor.Process (command, frame);
 			}
 
 			_commandsList.RemoveCommands (frameCommands);
