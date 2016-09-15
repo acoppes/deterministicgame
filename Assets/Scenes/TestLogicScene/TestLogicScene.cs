@@ -180,6 +180,12 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	#region CommandProcessor implementation
 
+	public bool CheckReady (Commands commands, int frame)
+	{
+		// check if each player has commands enqueued in the Commands api
+		return true;
+	}
+
 	public void Process (Command command, int frame)
 	{
 		MoveCommand moveCommand = command as MoveCommand;

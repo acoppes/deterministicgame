@@ -20,7 +20,9 @@ namespace Gemserk.Lockstep
 
 		public bool IsReady (int frame)
 		{
-			return _commands.HasCommands (frame);
+			if (!_commands.HasCommands (frame))
+				return false;
+			return _commandProcessor.CheckReady(_commands, frame);
 		}
 
 		public void Process (int frame)
