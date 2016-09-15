@@ -1,6 +1,19 @@
 namespace Gemserk.Lockstep 
 {
-	public class Command
+	public interface Command
+	{
+		int CreationFrame 
+		{
+			get; set;
+		}
+
+		int ProcessFrame 
+		{
+			get; set;
+		}
+	}
+
+	public class CommandBase : Command
 	{
 		public int CreationFrame 
 		{

@@ -133,7 +133,7 @@ public class Replay
 
 public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor {
 
-	public class MoveCommand : Command
+	public class MoveCommand : CommandBase
 	{
 		public Vector2 destination;
 
@@ -231,7 +231,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		unit.Unit.SetPosition (new Vector2 (0, 0));
 
 		// by default enqueues an empty command for first lockstep frame
-		commandList.AddCommand (new Command () {
+		commandList.AddCommand (new CommandBase () {
 			CreationFrame = 0,
 			ProcessFrame = gameFixedUpdate.GetFirstLockstepFrame()
 		});
@@ -339,7 +339,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		// Debug.Log ("Timestep: " + frame);
 
 		// add empty command each fixed step just in case...
-		AddCommand(new Command());
+		AddCommand(new CommandBase());
 
 		_replay.Update (frame);
 
