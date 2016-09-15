@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Text;
 using Gemserk.Lockstep;
 
 public class Replay

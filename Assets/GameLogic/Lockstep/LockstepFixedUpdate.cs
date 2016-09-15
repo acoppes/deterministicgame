@@ -1,12 +1,5 @@
 namespace Gemserk.Lockstep 
 {
-	public interface LockstepLogic
-	{
-		bool IsReady(int frame);
-
-		void Process(int frame);
-	}
-
 	public class LockstepFixedUpdate : GameFixedUpdate
 	{
 		readonly LockstepLogic _lockstepLogic;
