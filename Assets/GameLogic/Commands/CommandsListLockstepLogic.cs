@@ -4,13 +4,13 @@ namespace Gemserk.Lockstep
 {
 	public class CommandsListLockstepLogic : LockstepLogic 
 	{
-		readonly CommandsList _commandsList;
+		readonly Commands _commandsList;
 
 		readonly CommandProcessor _commandProcessor;
 
 		readonly List<Command> frameCommands = new List<Command>();
 
-		public CommandsListLockstepLogic(CommandsList commandsList, CommandProcessor commandProcessor)
+		public CommandsListLockstepLogic(Commands commandsList, CommandProcessor commandProcessor)
 		{
 			_commandsList = commandsList;
 			_commandProcessor = commandProcessor;
@@ -32,6 +32,7 @@ namespace Gemserk.Lockstep
 		public void Process (int frame)
 		{
 			frameCommands.Clear ();
+
 			_commandsList.GetCommands (frame, frameCommands);
 
 			for (int i = 0; i < frameCommands.Count; i++) {
@@ -39,9 +40,9 @@ namespace Gemserk.Lockstep
 				_commandProcessor.Process (command, frame);
 			}
 
-			_commandsList.RemoveCommands (frameCommands);
-
 			frameCommands.Clear ();
+
+			_commandsList.RemoveCommands (frame);
 		}
 
 		#endregion

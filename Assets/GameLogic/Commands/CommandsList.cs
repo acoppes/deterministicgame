@@ -2,9 +2,11 @@ using System.Collections.Generic;
 
 namespace Gemserk.Lockstep 
 {
-	public class CommandsList
+	public class CommandsList : Commands
 	{
 		readonly List<Command> _commands = new List<Command>();
+
+		readonly List<Command> _tmpRemoveCommands = new List<Command>();
 
 		public List<Command> Commands {
 			get {
@@ -17,6 +19,12 @@ namespace Gemserk.Lockstep
 			_commands.Add (command);
 		}
 
+		public void GetCommands(List<Command> commands)
+		{
+			for (int i = 0; i < _commands.Count; i++)
+				commands.Add (_commands [i]);
+		}
+
 		public void GetCommands(int frame, List<Command> commands)
 		{
 			for (int i = 0; i < _commands.Count; i++) {
@@ -25,12 +33,22 @@ namespace Gemserk.Lockstep
 			}
 		}
 
-		public void RemoveCommands(List<Command> commands)
+		public void RemoveCommands(int frame)
 		{
-			for (int i = 0; i < commands.Count; i++) {
-				var command = commands [i];
-				_commands.Remove (command);
+			// collect commands to be removed
+
+			for (int i = 0; i < _commands.Count; i++) {
+				var command = _commands [i];
+				if (command.ProcessFrame == frame)
+					_tmpRemoveCommands.Add (command);
 			}
+
+			for (int i = 0; i < _tmpRemoveCommands.Count; i++) {
+				var removedCommand = _tmpRemoveCommands [i];
+				_commands.Remove (removedCommand);
+			}
+
+			_tmpRemoveCommands.Clear ();
 		}
 	}
 

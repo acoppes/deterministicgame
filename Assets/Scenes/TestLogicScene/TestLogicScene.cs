@@ -12,7 +12,7 @@ public class Replay
 
 	readonly ChecksumRecorder _checksumRecorder;
 
-	readonly CommandsList _commandsList;
+	readonly Commands _commandsList;
 
 	ChecksumValidator _checksumValidator;
 
@@ -44,7 +44,7 @@ public class Replay
 		}
 	}
 
-	public Replay(GameFixedUpdate gameFixedUpdate, ChecksumRecorder checksumRecorder, RecorderView recorderView, CommandsList commandsList)
+	public Replay(GameFixedUpdate gameFixedUpdate, ChecksumRecorder checksumRecorder, RecorderView recorderView, Commands commandsList)
 	{
 		_recording = true;
 		_lastRecordedGameFrame = 0;
@@ -76,11 +76,16 @@ public class Replay
 		// _checksumRecorder.Reset ();
 	}
 
+	readonly List<Command> _commandsToRecord = new List<Command>();
+
 	public void RecordCommands()
 	{
-		List<Command> commands = _commandsList.Commands;
-		for (int i = 0; i < commands.Count; i++) {
-			var command = commands [i];
+		_commandsToRecord.Clear ();
+
+		_commandsList.GetCommands (_commandsToRecord);
+
+		for (int i = 0; i < _commandsToRecord.Count; i++) {
+			var command = _commandsToRecord [i];
 			_commandsRecorder.AddCommand (_gameFixedUpdate.GameTime, _gameFixedUpdate.CurrentGameFrame, command);
 		}
 	}
@@ -144,7 +149,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		
 	LockstepFixedUpdate gameFixedUpdate;
 
-	CommandsList commandList;
+	Commands commandList;
 
 	public UnitBehaviour unit;
 
