@@ -296,11 +296,12 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			if (Input.GetMouseButtonUp (1)) {
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
 			
-				AddCommand (new MoveCommand (position));
+				_lastCommand = ConfigureCommand (new MoveCommand (position));
+//				AddCommand (new MoveCommand (position));
 
 				feedbackClick.ShowFeedback (position);
 
-				_replay.RecordCommands ();
+//				_replay.RecordCommands ();
 			}
 
 			if (Input.touchCount > 0) {
@@ -308,11 +309,12 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 				if (Input.GetTouch (0).phase == TouchPhase.Ended) {
 					Vector2 position = camera.ScreenToWorldPoint (Input.GetTouch (0).position);
 
-					AddCommand (new MoveCommand (position));
+					_lastCommand = ConfigureCommand (new MoveCommand (position));
+//					AddCommand (new MoveCommand (position));
 
 					feedbackClick.ShowFeedback (position);
 
-					_replay.RecordCommands ();
+//					_replay.RecordCommands ();
 				}
 
 			}
@@ -332,13 +334,19 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		}
 	}
 
-	void AddCommand(Command command)
+	Command _lastCommand;
+
+	Command ConfigureCommand(Command command)
 	{
 		command.CreationFrame = gameFixedUpdate.CurrentGameFrame;
-
 		// to be processed in the next commands frame (next lockstep frame)
 		command.ProcessFrame = gameFixedUpdate.GetNextLockstepFrame ();
 
+		return command;
+	}
+
+	void EnqueueCommand(Command command)
+	{
 		commandList.AddCommand (command);
 	}
 
@@ -349,7 +357,22 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		// Debug.Log ("Timestep: " + frame);
 
 		// add empty command each fixed step just in case...
-		AddCommand(new CommandBase());
+
+		if (gameFixedUpdate.IsLastFrameForNextLockstep (frame)) {
+			if (_lastCommand == null) {
+				_lastCommand = new CommandBase ();
+				ConfigureCommand (_lastCommand);
+			}
+
+			EnqueueCommand(_lastCommand);
+			_lastCommand = null;
+
+			if (_replay.IsRecording) {
+				_replay.RecordCommands ();
+			}
+		}
+
+//		AddCommand(new CommandBase());
 
 		_replay.Update (frame);
 
