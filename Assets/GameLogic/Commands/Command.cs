@@ -1,3 +1,4 @@
+
 namespace Gemserk.Lockstep 
 {
 	public interface Command
@@ -34,4 +35,6 @@ namespace Gemserk.Lockstep
 		// process each individual command
 		void Process(Command command, int frame);
 	}
+
+
 }

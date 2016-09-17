@@ -68,5 +68,10 @@ namespace Gemserk.Lockstep
 			int d = (currentFrame / GameFramesPerLockstep) + 2;
 			return GameFramesPerLockstep * d;
 		}
+
+		public bool IsLastFrameForNextLockstep(int frame)
+		{
+			return GetNextLockstepFrame (frame) != GetNextLockstepFrame (frame + 1);
+		}
 	}
 }

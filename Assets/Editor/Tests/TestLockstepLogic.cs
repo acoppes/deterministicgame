@@ -86,6 +86,24 @@ public class TestLockstepLogic {
 
 		Assert.That (lockstepGameLogic.IsLockstepTurn(), Is.False);
 	}
+
+	[Test]
+	public void TestGetLockstepFrameForCurrentFrame(){
+
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
+
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+
+		lockstepGameLogic.FixedStepTime = 0.1f;
+		lockstepGameLogic.GameFramesPerLockstep = 4;
+
+		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (0), Is.EqualTo (false));
+		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (1), Is.EqualTo (false));
+		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (2), Is.EqualTo (false));
+		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (3), Is.EqualTo (true));
+		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (7), Is.EqualTo (true));
+		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (8), Is.EqualTo (false));
+	}
 		
 }
 
