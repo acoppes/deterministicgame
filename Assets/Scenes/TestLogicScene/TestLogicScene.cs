@@ -135,7 +135,7 @@ public class Replay
 
 }
 
-public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandSenderProcessor {
+public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandSender {
 
 	public class MoveCommand : CommandBase
 	{
@@ -164,7 +164,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	Replay _replay;
 
-	CommandSender _commandSender;
+	CommandQueue _commandSender;
 
 	public int gameFramesPerChecksumCheck = 10;
 
@@ -237,7 +237,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = checksumRecorder;
 
-		_commandSender = new CommandSenderBase (gameFixedUpdate, this);
+		_commandSender = new CommandQueueBase (gameFixedUpdate, this);
 
 		ResetGameState ();
 

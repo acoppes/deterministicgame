@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Gemserk.Lockstep 
 {
-	public interface CommandSender 
+	public interface CommandQueue 
 	{
 		void EnqueueCommand(Command command);
 
@@ -16,7 +16,7 @@ namespace Gemserk.Lockstep
 		Command GetEmptyCommand();
 	}
 
-	public interface CommandSenderProcessor
+	public interface CommandSender
 	{
 		void SendEmpty();
 
@@ -28,17 +28,17 @@ namespace Gemserk.Lockstep
 	/// current lockstep frame, to be processed in next lockstep frame. In case no commands were 
 	/// enqueued, it sends an empty command to keep the game lockstep working.
 	/// </summary>
-	public class CommandSenderBase : CommandSender
+	public class CommandQueueBase : CommandQueue
 	{
 		readonly LockstepUpdate _lockstepUpdate;
-		readonly CommandSenderProcessor _commandProcessor;
+		readonly CommandSender _commandSender;
 
 		readonly List<Command> _queuedCommands = new List<Command>();
 
-		public CommandSenderBase(LockstepUpdate lockstepUpdate, CommandSenderProcessor commandProcessor)
+		public CommandQueueBase(LockstepUpdate lockstepUpdate, CommandSender commandSender)
 		{
 			_lockstepUpdate = lockstepUpdate;
-			_commandProcessor = commandProcessor;
+			_commandSender = commandSender;
 		}
 
 		public bool IsReady()
@@ -54,9 +54,9 @@ namespace Gemserk.Lockstep
 		public void SendCommands()
 		{
 			if (_queuedCommands.Count == 0) {
-				_commandProcessor.SendEmpty ();
+				_commandSender.SendEmpty ();
 			} else {
-				_commandProcessor.SendCommands (_queuedCommands);
+				_commandSender.SendCommands (_queuedCommands);
 				_queuedCommands.Clear ();
 			}
 		}
