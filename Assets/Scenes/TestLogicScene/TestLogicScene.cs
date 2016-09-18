@@ -217,15 +217,18 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (gameState, this));
 
-		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
-		checksumRecorderDebug.checksumRecorder = checksumRecorder;
-
 		// TODO: set replay....
 
 		gameFixedUpdate = new LockstepFixedUpdate (new CommandsListLockstepLogic(commandList, this));
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 		gameFixedUpdate.SetGameLogic (this);
+
+		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
+		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
+
+		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
+		checksumRecorderDebug.checksumRecorder = checksumRecorder;
 
 		_commandSender = new CommandSenderBase (gameFixedUpdate, commandList, this);
 
@@ -237,8 +240,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		StartRecording ();
 
 		// debug...
-		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
-		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
+
 
 		Application.targetFrameRate = 60;
 
@@ -308,13 +310,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			if (Input.GetMouseButtonUp (1)) {
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
 			
-				_lastCommand = ConfigureCommand (new MoveCommand (position));
-//				_commandSender.EnqueueCommand (_lastCommand);
-//				AddCommand (new MoveCommand (position));
+				_commandSender.EnqueueCommand (ConfigureCommand (new MoveCommand (position)));
 
 				feedbackClick.ShowFeedback (position);
-
-//				_replay.RecordCommands ();
 			}
 
 			if (Input.touchCount > 0) {
@@ -322,12 +320,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 				if (Input.GetTouch (0).phase == TouchPhase.Ended) {
 					Vector2 position = camera.ScreenToWorldPoint (Input.GetTouch (0).position);
 
-					_lastCommand = ConfigureCommand (new MoveCommand (position));
-//					AddCommand (new MoveCommand (position));
+					_commandSender.EnqueueCommand (ConfigureCommand (new MoveCommand (position)));
 
 					feedbackClick.ShowFeedback (position);
-
-//					_replay.RecordCommands ();
 				}
 
 			}
@@ -346,9 +341,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			_replay.ReplayCommands ();
 		}
 	}
-
-	Command _lastCommand;
-
+		
 	Command ConfigureCommand(Command command)
 	{
 		command.ProcessFrame = gameFixedUpdate.GetNextLockstepFrame ();
@@ -367,11 +360,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		// Debug.Log ("Timestep: " + frame);
 
 		// add empty command each fixed step just in case...
-
-		if (_lastCommand != null) {
-			_commandSender.EnqueueCommand (_lastCommand);
-			_lastCommand = null;
-		}
 
 		if (_commandSender.IsReady())
 			_commandSender.SendCommands ();
