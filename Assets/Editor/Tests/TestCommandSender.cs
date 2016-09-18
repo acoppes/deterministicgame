@@ -9,12 +9,13 @@ public class TestCommandSender {
 	
 		var lockstep = NSubstitute.Substitute.For<LockstepUpdate> ();
 		var commands = NSubstitute.Substitute.For<Commands> ();
+		var commandProvider = NSubstitute.Substitute.For<CommandEmptyProvider> ();
 
 		lockstep.IsLastFrameForNextLockstep ().Returns (false);
 
 		var emptyCommand = new CommandBase ();
 
-		CommandSender sender = new CommandSender (lockstep, commands, emptyCommand);
+		CommandSender sender = new CommandSender (lockstep, commands, commandProvider);
 	
 		sender.SendCommands ();
 
@@ -27,14 +28,16 @@ public class TestCommandSender {
 
 		var lockstep = NSubstitute.Substitute.For<LockstepUpdate> ();
 		var commands = NSubstitute.Substitute.For<Commands> ();
+		var commandProvider = NSubstitute.Substitute.For<CommandEmptyProvider> ();
 
 		lockstep.IsLastFrameForNextLockstep ().Returns (true);
 		lockstep.GetCurrentFrame().Returns (2);
 		lockstep.GetNextLockstepFrame ().Returns (5);
 
 		var emptyCommand = new CommandBase ();
+		commandProvider.GetEmptyCommand ().Returns (emptyCommand);
 
-		CommandSender sender = new CommandSender (lockstep, commands, emptyCommand);
+		CommandSender sender = new CommandSender (lockstep, commands, commandProvider);
 
 		sender.SendCommands ();
 
@@ -51,13 +54,16 @@ public class TestCommandSender {
 
 		var lockstep = NSubstitute.Substitute.For<LockstepUpdate> ();
 		var commands = NSubstitute.Substitute.For<Commands> ();
+		var commandProvider = NSubstitute.Substitute.For<CommandEmptyProvider> ();
 
 		lockstep.IsLastFrameForNextLockstep ().Returns (true);
 
 		var emptyCommand = new CommandBase ();
+		commandProvider.GetEmptyCommand ().Returns (emptyCommand);
+
 		var aCommand = new CommandBase() ;
 
-		CommandSender sender = new CommandSender (lockstep, commands, emptyCommand);
+		CommandSender sender = new CommandSender (lockstep, commands, commandProvider);
 		sender.EnqueueCommand (aCommand);
 
 		sender.SendCommands ();
@@ -72,13 +78,16 @@ public class TestCommandSender {
 
 		var lockstep = NSubstitute.Substitute.For<LockstepUpdate> ();
 		var commands = NSubstitute.Substitute.For<Commands> ();
+		var commandProvider = NSubstitute.Substitute.For<CommandEmptyProvider> ();
 
 		lockstep.IsLastFrameForNextLockstep ().Returns (true);
 
 		var emptyCommand = new CommandBase ();
+		commandProvider.GetEmptyCommand ().Returns (emptyCommand);
+
 		var aCommand = new CommandBase() ;
 
-		CommandSender sender = new CommandSender (lockstep, commands, emptyCommand);
+		CommandSender sender = new CommandSender (lockstep, commands, commandProvider);
 		sender.EnqueueCommand (aCommand);
 
 		sender.SendCommands ();
@@ -96,15 +105,17 @@ public class TestCommandSender {
 
 		var lockstep = NSubstitute.Substitute.For<LockstepUpdate> ();
 		var commands = NSubstitute.Substitute.For<Commands> ();
+		var commandProvider = NSubstitute.Substitute.For<CommandEmptyProvider> ();
 
 		lockstep.IsLastFrameForNextLockstep ().Returns (true);
 
 		var emptyCommand = new CommandBase ();
+		commandProvider.GetEmptyCommand ().Returns (emptyCommand);
 
 		var aCommand = new CommandBase() ;
 		var anotherCommand = new CommandBase() ;
 
-		CommandSender sender = new CommandSender (lockstep, commands, emptyCommand);
+		CommandSender sender = new CommandSender (lockstep, commands, commandProvider);
 		sender.EnqueueCommand (aCommand);
 		sender.EnqueueCommand (anotherCommand);
 

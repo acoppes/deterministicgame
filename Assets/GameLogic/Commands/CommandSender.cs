@@ -2,6 +2,16 @@ using System.Collections.Generic;
 
 namespace Gemserk.Lockstep 
 {
+//	public interface CommandSenderInterface 
+//	{
+//		
+//	}
+
+	public interface CommandEmptyProvider
+	{
+		Command GetEmptyCommand();
+	}
+
 	/// <summary>
 	/// This class responsibility is to enqueue commands and send them to process at the end of this 
 	/// current lockstep frame, to be processed in next lockstep frame. In case no commands were 
@@ -11,15 +21,15 @@ namespace Gemserk.Lockstep
 	{
 		readonly LockstepUpdate _lockstepUpdate;
 		readonly Commands _commands;
-		readonly Command _emptyCommand;
+		readonly CommandEmptyProvider _commandProvider;
 
 		readonly List<Command> _queuedCommands = new List<Command>();
 
-		public CommandSender(LockstepUpdate lockstepUpdate, Commands commands, Command emptyCommand)
+		public CommandSender(LockstepUpdate lockstepUpdate, Commands commands, CommandEmptyProvider commandProvider)
 		{
 			_lockstepUpdate = lockstepUpdate;
 			_commands = commands;
-			_emptyCommand = emptyCommand;
+			_commandProvider = commandProvider;
 		}
 
 		public void EnqueueCommand(Command command)
@@ -32,9 +42,12 @@ namespace Gemserk.Lockstep
 			if (_lockstepUpdate.IsLastFrameForNextLockstep ()) {
 
 				if (_queuedCommands.Count == 0) {
-					_emptyCommand.CreationFrame = _lockstepUpdate.GetCurrentFrame ();
-					_emptyCommand.ProcessFrame = _lockstepUpdate.GetNextLockstepFrame ();
-					_commands.AddCommand (_emptyCommand);
+					var emptyCommand = _commandProvider.GetEmptyCommand ();
+
+					emptyCommand.CreationFrame = _lockstepUpdate.GetCurrentFrame ();
+					emptyCommand.ProcessFrame = _lockstepUpdate.GetNextLockstepFrame ();
+
+					_commands.AddCommand (emptyCommand);
 				} else {
 					for (int i = 0; i < _queuedCommands.Count; i++) {
 						var command = _queuedCommands [i];

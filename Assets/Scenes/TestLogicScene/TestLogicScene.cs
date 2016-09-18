@@ -135,7 +135,7 @@ public class Replay
 
 }
 
-public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor {
+public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandEmptyProvider {
 
 	public class MoveCommand : CommandBase
 	{
@@ -163,6 +163,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 	public RecorderView recorderView;
 
 	Replay _replay;
+
+	CommandSender _commandSender;
 
 	public int gameFramesPerChecksumCheck = 10;
 
@@ -197,6 +199,15 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	#endregion
 
+	#region CommandEmptyProvider implementation
+
+	public Command GetEmptyCommand ()
+	{
+		return new CommandBase ();
+	}
+
+	#endregion
+
 
 	void Awake()
 	{
@@ -215,6 +226,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 		gameFixedUpdate.SetGameLogic (this);
+
+		_commandSender = new CommandSender (gameFixedUpdate, commandList, this);
 
 		ResetGameState ();
 
@@ -297,6 +310,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 				Vector2 position = camera.ScreenToWorldPoint (Input.mousePosition);
 			
 				_lastCommand = ConfigureCommand (new MoveCommand (position));
+//				_commandSender.EnqueueCommand (_lastCommand);
 //				AddCommand (new MoveCommand (position));
 
 				feedbackClick.ShowFeedback (position);
@@ -358,19 +372,30 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		// add empty command each fixed step just in case...
 
-		if (gameFixedUpdate.IsLastFrameForNextLockstep (frame)) {
-			if (_lastCommand == null) {
-				_lastCommand = new CommandBase ();
-				ConfigureCommand (_lastCommand);
-			}
-
-			SendCommand(_lastCommand);
+		if (_lastCommand != null) {
+			_commandSender.EnqueueCommand (_lastCommand);
 			_lastCommand = null;
-
-			if (_replay.IsRecording) {
-				_replay.RecordCommands ();
-			}
 		}
+
+		_commandSender.SendCommands ();
+
+		if (_replay.IsRecording) {
+			_replay.RecordCommands ();
+		}
+
+//		if (gameFixedUpdate.IsLastFrameForNextLockstep (frame)) {
+//			if (_lastCommand == null) {
+//				_lastCommand = new CommandBase ();
+//				ConfigureCommand (_lastCommand);
+//			}
+//
+//			SendCommand(_lastCommand);
+//			_lastCommand = null;
+//
+//			if (_replay.IsRecording) {
+//				_replay.RecordCommands ();
+//			}
+//		}
 
 //		AddCommand(new CommandBase());
 
