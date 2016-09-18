@@ -43,10 +43,7 @@ namespace Gemserk.Lockstep
 
 				if (_queuedCommands.Count == 0) {
 					var emptyCommand = _commandProvider.GetEmptyCommand ();
-
-					emptyCommand.CreationFrame = _lockstepUpdate.GetCurrentFrame ();
 					emptyCommand.ProcessFrame = _lockstepUpdate.GetNextLockstepFrame ();
-
 					_commands.AddCommand (emptyCommand);
 				} else {
 					for (int i = 0; i < _queuedCommands.Count; i++) {

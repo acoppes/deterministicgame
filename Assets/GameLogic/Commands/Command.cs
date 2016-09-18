@@ -3,11 +3,6 @@ namespace Gemserk.Lockstep
 {
 	public interface Command
 	{
-		int CreationFrame 
-		{
-			get; set;
-		}
-
 		int ProcessFrame 
 		{
 			get; set;
@@ -16,11 +11,6 @@ namespace Gemserk.Lockstep
 
 	public class CommandBase : Command
 	{
-		public int CreationFrame 
-		{
-			get; set;
-		}
-
 		public int ProcessFrame 
 		{
 			get; set;

@@ -31,7 +31,6 @@ public class TestCommandSender {
 		var commandProvider = NSubstitute.Substitute.For<CommandEmptyProvider> ();
 
 		lockstep.IsLastFrameForNextLockstep ().Returns (true);
-		lockstep.GetCurrentFrame().Returns (2);
 		lockstep.GetNextLockstepFrame ().Returns (5);
 
 		var emptyCommand = new CommandBase ();
@@ -44,7 +43,7 @@ public class TestCommandSender {
 		lockstep.Received ().IsLastFrameForNextLockstep ();
 		// commands.Received ().AddCommand (emptyCommand);
 
-		commands.Received ().AddCommand (Arg.Is<Command> (c => c == emptyCommand && c.ProcessFrame == 5 && c.CreationFrame == 2));
+		commands.Received ().AddCommand (Arg.Is<Command> (c => c == emptyCommand && c.ProcessFrame == 5));
 
 		//  .Add(Arg.Any<int>(), Arg.Is<int>(x => x >= 500));
 	}

@@ -255,7 +255,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		// by default enqueues an empty command for first lockstep frame
 		commandList.AddCommand (new CommandBase () {
-			CreationFrame = 0,
 			ProcessFrame = gameFixedUpdate.GetFirstLockstepFrame()
 		});
 	}
@@ -352,10 +351,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	Command ConfigureCommand(Command command)
 	{
-		command.CreationFrame = gameFixedUpdate.CurrentGameFrame;
-		// to be processed in the next commands frame (next lockstep frame)
 		command.ProcessFrame = gameFixedUpdate.GetNextLockstepFrame ();
-
 		return command;
 	}
 
@@ -382,22 +378,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		if (_replay.IsRecording) {
 			_replay.RecordCommands ();
 		}
-
-//		if (gameFixedUpdate.IsLastFrameForNextLockstep (frame)) {
-//			if (_lastCommand == null) {
-//				_lastCommand = new CommandBase ();
-//				ConfigureCommand (_lastCommand);
-//			}
-//
-//			SendCommand(_lastCommand);
-//			_lastCommand = null;
-//
-//			if (_replay.IsRecording) {
-//				_replay.RecordCommands ();
-//			}
-//		}
-
-//		AddCommand(new CommandBase());
 
 		_replay.Update (frame);
 
