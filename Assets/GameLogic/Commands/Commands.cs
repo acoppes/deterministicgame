@@ -14,4 +14,5 @@ namespace Gemserk.Lockstep
 
 		void RemoveCommands(int frame);
 	}
+
 }

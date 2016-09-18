@@ -345,7 +345,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		return command;
 	}
 
-	void EnqueueCommand(Command command)
+	void SendCommand(Command command)
 	{
 		commandList.AddCommand (command);
 	}
@@ -364,7 +364,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 				ConfigureCommand (_lastCommand);
 			}
 
-			EnqueueCommand(_lastCommand);
+			SendCommand(_lastCommand);
 			_lastCommand = null;
 
 			if (_replay.IsRecording) {

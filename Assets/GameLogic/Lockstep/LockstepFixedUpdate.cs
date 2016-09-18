@@ -1,6 +1,15 @@
 namespace Gemserk.Lockstep 
 {
-	public class LockstepFixedUpdate : GameFixedUpdate
+	public interface LockstepUpdate 
+	{
+		bool IsLastFrameForNextLockstep();
+
+		int GetNextLockstepFrame ();
+
+		int GetCurrentFrame();
+	}
+		
+	public class LockstepFixedUpdate : GameFixedUpdate, LockstepUpdate
 	{
 		readonly LockstepLogic _lockstepLogic;
 
@@ -53,6 +62,11 @@ namespace Gemserk.Lockstep
 			_lockstepLogic.Process(CurrentGameFrame);
 		}
 
+		public int GetCurrentFrame()
+		{
+			return CurrentGameFrame;
+		}
+
 		public int GetFirstLockstepFrame()
 		{
 			return GameFramesPerLockstep;
@@ -72,6 +86,11 @@ namespace Gemserk.Lockstep
 		public bool IsLastFrameForNextLockstep(int frame)
 		{
 			return GetNextLockstepFrame (frame) != GetNextLockstepFrame (frame + 1);
+		}
+
+		public bool IsLastFrameForNextLockstep()
+		{
+			return IsLastFrameForNextLockstep (CurrentGameFrame);
 		}
 	}
 }
