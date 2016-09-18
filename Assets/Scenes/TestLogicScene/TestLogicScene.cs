@@ -135,7 +135,7 @@ public class Replay
 
 }
 
-public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandEmptyProvider {
+public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandSenderProcessor {
 
 	public class MoveCommand : CommandBase
 	{
@@ -199,11 +199,18 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	#endregion
 
-	#region CommandEmptyProvider implementation
+	#region CommandSenderProcessor implementation
 
-	public Command GetEmptyCommand ()
+	public void SendEmpty ()
 	{
-		return new CommandBase ();
+		this.commandList.AddCommand(ConfigureCommand(new CommandBase()));
+	}
+
+	public void SendCommands (List<Command> commands)
+	{
+		foreach (var command in commands) {
+			this.commandList.AddCommand (command);
+		}
 	}
 
 	#endregion
@@ -230,7 +237,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = checksumRecorder;
 
-		_commandSender = new CommandSenderBase (gameFixedUpdate, commandList, this);
+		_commandSender = new CommandSenderBase (gameFixedUpdate, this);
 
 		ResetGameState ();
 
