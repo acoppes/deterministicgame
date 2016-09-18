@@ -2,11 +2,11 @@ namespace Gemserk.Lockstep
 {
 	public class GameStateChecksumProvider : ChecksumProvider
 	{
-		readonly GameState _gameState;
+		readonly GameStateBuilder _gameState;
 
 		readonly GameStateProvider _gameStateProvider;
 
-		public GameStateChecksumProvider(GameState gameState, GameStateProvider rootProvider)
+		public GameStateChecksumProvider(GameStateBuilder gameState, GameStateProvider rootProvider)
 		{
 			_gameState = gameState;
 			_gameStateProvider = rootProvider;

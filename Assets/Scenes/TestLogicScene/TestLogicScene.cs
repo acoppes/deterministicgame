@@ -168,13 +168,16 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	public int gameFramesPerChecksumCheck = 10;
 
-	GameState gameState;
+	GameStateBuilder gameState;
 
 	#region GameStateProvider implementation
 
-	public void SaveState (GameState gameState)
+	public void SaveState (GameStateBuilder gameState)
 	{
+		gameState.StartObject ("Engine");
 		gameState.SetInt ("frame", gameFixedUpdate.CurrentGameFrame);
+		gameState.EndObject ();
+
 		unit.Unit.SaveState (gameState);
 	}
 
@@ -296,6 +299,13 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
+
+
+		if (Input.GetKeyUp (KeyCode.S)) {
+			var stateBuilder = new GameStateStringBuilderImpl ();
+			SaveState (stateBuilder);
+			Debug.Log ((stateBuilder.GetGameState() as GameStateStringImpl).State);
+		}
 	
 		if (Input.GetKeyUp (KeyCode.P)) {
 			StartPlayback ();

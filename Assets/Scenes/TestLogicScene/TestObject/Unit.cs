@@ -44,14 +44,16 @@ public class Unit : GameLogic, GameStateProvider
 
 	#region GameStateProvider implementation
 
-	public void SaveState (GameState gameState)
+	public void SaveState (GameStateBuilder gameState)
 	{
+		gameState.StartObject ("Unit");
 		gameState.SetFloat ("position.x", _gamePosition.x);
 		gameState.SetFloat ("position.y", _gamePosition.y);
 		gameState.SetFloat ("speed", speed);
 		gameState.SetBool ("moving", _moving);
 		gameState.SetFloat ("destination.x", _destination.x);
 		gameState.SetFloat ("destination.y", _destination.y);
+		gameState.EndObject ();
 	}
 
 	#endregion
