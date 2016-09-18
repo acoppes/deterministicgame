@@ -19,17 +19,27 @@ namespace Gemserk.Lockstep
 		}
 		#endregion
 
-		public void SetInt (int i)
+		public void StartObject (string name)
+		{
+			throw new System.NotImplementedException ();
+		}
+
+		public void EndObject ()
+		{
+			throw new System.NotImplementedException ();
+		}
+
+		public void SetInt (string name, int i)
 		{
 			state.Append (i);
 		}
 
-		public void SetFloat (float f)
+		public void SetFloat (string name, float f)
 		{
 			state.Append (f);
 		}
 
-		public void SetBool (bool b)
+		public void SetBool (string name, bool b)
 		{
 			state.Append (b);
 		}

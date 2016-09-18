@@ -6,9 +6,9 @@ public class TestObject : GameStateProvider
 	#region GameStateProvider implementation
 	public void Provide (GameState gameState)
 	{
-		gameState.SetInt (10);
-		gameState.SetInt (5);
-		gameState.SetInt (20);
+		gameState.SetInt ("x", 10);
+		gameState.SetInt ("y", 5);
+		gameState.SetInt ("z", 20);
 	}
 	#endregion
 }

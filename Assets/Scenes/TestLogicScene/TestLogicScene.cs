@@ -174,7 +174,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	public void Provide (GameState gameState)
 	{
-		gameState.SetInt (gameFixedUpdate.CurrentGameFrame);
+		gameState.SetInt ("frame", gameFixedUpdate.CurrentGameFrame);
 		unit.Unit.Provide (gameState);
 	}
 

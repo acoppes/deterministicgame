@@ -2,11 +2,15 @@ namespace Gemserk.Lockstep
 {
 	public interface GameState : ChecksumProvider
 	{
-		void SetInt(int i);
+		void StartObject(string name);
 
-		void SetFloat(float f);
+		void EndObject();
 
-		void SetBool(bool b);
+		void SetInt(string name, int i);
+
+		void SetFloat(string name, float f);
+
+		void SetBool(string name, bool b);
 
 		void Reset();
 	}
