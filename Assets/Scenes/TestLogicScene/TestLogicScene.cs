@@ -227,7 +227,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 		gameFixedUpdate.SetGameLogic (this);
 
-		_commandSender = new CommandSender (gameFixedUpdate, commandList, this);
+		_commandSender = new CommandSenderBase (gameFixedUpdate, commandList, this);
 
 		ResetGameState ();
 
@@ -373,7 +373,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			_lastCommand = null;
 		}
 
-		_commandSender.SendCommands ();
+		if (_commandSender.IsReady())
+			_commandSender.SendCommands ();
 
 		if (_replay.IsRecording) {
 			_replay.RecordCommands ();

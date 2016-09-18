@@ -2,10 +2,14 @@ using System.Collections.Generic;
 
 namespace Gemserk.Lockstep 
 {
-//	public interface CommandSenderInterface 
-//	{
-//		
-//	}
+	public interface CommandSender 
+	{
+		void EnqueueCommand(Command command);
+
+		bool IsReady();
+
+		void SendCommands();
+	}
 
 	public interface CommandEmptyProvider
 	{
@@ -17,7 +21,7 @@ namespace Gemserk.Lockstep
 	/// current lockstep frame, to be processed in next lockstep frame. In case no commands were 
 	/// enqueued, it sends an empty command to keep the game lockstep working.
 	/// </summary>
-	public class CommandSender
+	public class CommandSenderBase : CommandSender
 	{
 		readonly LockstepUpdate _lockstepUpdate;
 		readonly Commands _commands;
@@ -25,11 +29,16 @@ namespace Gemserk.Lockstep
 
 		readonly List<Command> _queuedCommands = new List<Command>();
 
-		public CommandSender(LockstepUpdate lockstepUpdate, Commands commands, CommandEmptyProvider commandProvider)
+		public CommandSenderBase(LockstepUpdate lockstepUpdate, Commands commands, CommandEmptyProvider commandProvider)
 		{
 			_lockstepUpdate = lockstepUpdate;
 			_commands = commands;
 			_commandProvider = commandProvider;
+		}
+
+		public bool IsReady()
+		{
+			return _lockstepUpdate.IsLastFrameForNextLockstep ();
 		}
 
 		public void EnqueueCommand(Command command)
@@ -39,19 +48,16 @@ namespace Gemserk.Lockstep
 
 		public void SendCommands()
 		{
-			if (_lockstepUpdate.IsLastFrameForNextLockstep ()) {
-
-				if (_queuedCommands.Count == 0) {
-					var emptyCommand = _commandProvider.GetEmptyCommand ();
-					emptyCommand.ProcessFrame = _lockstepUpdate.GetNextLockstepFrame ();
-					_commands.AddCommand (emptyCommand);
-				} else {
-					for (int i = 0; i < _queuedCommands.Count; i++) {
-						var command = _queuedCommands [i];
-						_commands.AddCommand (command);
-					}
-					_queuedCommands.Clear ();
+			if (_queuedCommands.Count == 0) {
+				var emptyCommand = _commandProvider.GetEmptyCommand ();
+				emptyCommand.ProcessFrame = _lockstepUpdate.GetNextLockstepFrame ();
+				_commands.AddCommand (emptyCommand);
+			} else {
+				for (int i = 0; i < _queuedCommands.Count; i++) {
+					var command = _queuedCommands [i];
+					_commands.AddCommand (command);
 				}
+				_queuedCommands.Clear ();
 			}
 		}
 	}
