@@ -44,7 +44,7 @@ public class Unit : GameLogic, GameStateProvider
 
 	#region GameStateProvider implementation
 
-	public void Provide (GameState gameState)
+	public void SaveState (GameState gameState)
 	{
 		gameState.SetFloat ("position.x", _gamePosition.x);
 		gameState.SetFloat ("position.y", _gamePosition.y);

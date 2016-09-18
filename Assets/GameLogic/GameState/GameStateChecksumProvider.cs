@@ -17,7 +17,7 @@ namespace Gemserk.Lockstep
 		public Checksum CalculateChecksum ()
 		{
 			_gameState.Reset ();
-			_gameStateProvider.Provide (_gameState);
+			_gameStateProvider.SaveState (_gameState);
 
 			return _gameState.CalculateChecksum ();
 		}

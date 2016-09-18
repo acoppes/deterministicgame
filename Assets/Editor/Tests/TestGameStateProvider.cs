@@ -4,7 +4,7 @@ using Gemserk.Lockstep;
 public class TestObject : GameStateProvider
 {
 	#region GameStateProvider implementation
-	public void Provide (GameState gameState)
+	public void SaveState (GameState gameState)
 	{
 		gameState.SetInt ("x", 10);
 		gameState.SetInt ("y", 5);
@@ -22,7 +22,7 @@ public class TestGameStateProvider {
 		TestObject testObject = new TestObject ();
 
 		gameState.Reset ();
-		testObject.Provide (gameState);
+		testObject.SaveState (gameState);
 
 		string state = gameState.State;
 		Assert.That (state, Is.EqualTo ("10520"));

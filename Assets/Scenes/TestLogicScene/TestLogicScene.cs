@@ -172,10 +172,10 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	#region GameStateProvider implementation
 
-	public void Provide (GameState gameState)
+	public void SaveState (GameState gameState)
 	{
 		gameState.SetInt ("frame", gameFixedUpdate.CurrentGameFrame);
-		unit.Unit.Provide (gameState);
+		unit.Unit.SaveState (gameState);
 	}
 
 	#endregion
