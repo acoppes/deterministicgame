@@ -1,18 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class RecorderView : MonoBehaviour {
+public class RecorderViewCanvas : MonoBehaviour, ReplayView {
 
 	public Text text;
 	public Text buttonText;
 
-	Replay _replay;
+	ReplayController _replayController;
 
 	public Slider slider;
 
-	public void SetReplay(Replay replay)
+	public void SetReplay(ReplayController replayController)
 	{
-		_replay = replay;
+		_replayController = replayController;
 	}
 
 	public void StartRecording()
@@ -29,10 +29,10 @@ public class RecorderView : MonoBehaviour {
 
 	void LateUpdate()
 	{
-		if (_replay == null)
+		if (_replayController == null)
 			return;
 
-		if (_replay.IsRecording) {
+		if (_replayController.IsRecording) {
 			if (slider.isActiveAndEnabled)
 				slider.gameObject.SetActive (false);
 			return;
@@ -43,6 +43,6 @@ public class RecorderView : MonoBehaviour {
 
 		slider.minValue = 0;
 		slider.maxValue = 1;
-		slider.value = _replay.NormalizedTime;
+		slider.value = _replayController.NormalizedTime;
 	}
 }

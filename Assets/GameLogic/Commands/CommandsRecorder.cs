@@ -13,8 +13,6 @@ namespace Gemserk.Lockstep
 
 		readonly List<RecordedCommand> recordedCommandsQueue = new List<RecordedCommand>();
 
-	//	public int lastGameFrame;
-
 		public void AddCommand(float gameTime, int gameFrame, Command command)
 		{
 			recordedCommandsQueue.Add (new RecordedCommand () { 
@@ -32,10 +30,6 @@ namespace Gemserk.Lockstep
 					commands.Add (recordedCommand.command);
 			}
 		}
-
-		public void Reset()
-		{
-			recordedCommandsQueue.Clear ();
-		}
+			
 	}
 }
