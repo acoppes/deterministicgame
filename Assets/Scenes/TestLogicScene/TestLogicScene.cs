@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Gemserk.Lockstep;
 
-public class Replay
+public class Replay : GameLogic
 {
 	readonly GameFixedUpdate _gameFixedUpdate;
 
@@ -114,25 +114,28 @@ public class Replay
 		return (frame % gameFramesPerChecksumCheck) == 0;
 	}
 
-	public void Update(int frame)
+	#region GameLogic implementation
+	public void GameUpdate (float dt, int frame)
 	{
 		ChecksumProvider checksumProvider = _checksumRecorder.ChecksumProvider;
 
 		if (_recording) {
+			RecordCommands ();
+
 			_lastRecordedGameFrame = _gameFixedUpdate.CurrentGameFrame;
 
 			if (IsChecksumFrame (frame)) {
 				_checksumRecorder.RecordState (frame);
 			}
 		} else {
-			
+
 			if (IsChecksumFrame (frame)) {
 				bool validState = _checksumValidator.IsValid (frame, checksumProvider.CalculateChecksum ());
 				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
 			}
 		}
 	}
-
+	#endregion
 }
 
 public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandSender {
@@ -250,7 +253,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		StartRecording ();
 
 		// debug...
-
 
 		Application.targetFrameRate = 60;
 
@@ -378,14 +380,12 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		// add empty command each fixed step just in case...
 
-		if (_commandSender.IsReady())
+		if (_commandSender.IsReady ())
 			_commandSender.SendCommands ();
 
-		if (_replay.IsRecording) {
-			_replay.RecordCommands ();
-		}
+		_replay.GameUpdate (dt, frame);
 
-		_replay.Update (frame);
+//		_replay.Update (frame);
 
 		// update game state...
 		unit.Unit.GameUpdate (dt, frame);
