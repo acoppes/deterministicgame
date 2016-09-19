@@ -11,11 +11,6 @@ namespace Gemserk.Lockstep
 		void SendCommands();
 	}
 
-	public interface CommandEmptyProvider
-	{
-		Command GetEmptyCommand();
-	}
-
 	public interface CommandSender
 	{
 		void SendEmpty();

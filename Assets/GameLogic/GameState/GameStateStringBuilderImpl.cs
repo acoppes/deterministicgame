@@ -2,6 +2,9 @@ using System.Text;
 
 namespace Gemserk.Lockstep 
 {
+	// TODO: a better implementation could be to generate a tree that represents the state
+	// and then have a way to create a string or another, base don the tree representation.
+
 	public class GameStateStringBuilderImpl : GameStateBuilder
 	{
 		StringBuilder state = new StringBuilder();
@@ -56,6 +59,8 @@ namespace Gemserk.Lockstep
 		public void Reset ()
 		{
 			state = new StringBuilder ();
+			firstObject = true;
+			firstElement = true;
 		}
 	}
 }

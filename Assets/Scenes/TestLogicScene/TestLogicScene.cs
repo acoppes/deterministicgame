@@ -168,7 +168,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	public int gameFramesPerChecksumCheck = 10;
 
-	GameStateBuilder gameState;
+	GameStateBuilder _gameStateBuilder;
 
 	#region GameStateProvider implementation
 
@@ -221,11 +221,11 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	void Awake()
 	{
-		gameState = new GameStateStringBuilderImpl ();
+		_gameStateBuilder = new GameStateStringBuilderImpl ();
 
 		commandList = new CommandsList();
 
-		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (gameState, this));
+		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (_gameStateBuilder, this));
 
 		// TODO: set replay....
 
