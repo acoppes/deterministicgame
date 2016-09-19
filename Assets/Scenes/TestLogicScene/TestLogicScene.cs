@@ -129,6 +129,8 @@ public class Replay : GameLogic
 			}
 		} else {
 
+			ReplayCommands ();
+
 			if (IsChecksumFrame (frame)) {
 				bool validState = _checksumValidator.IsValid (frame, checksumProvider.CalculateChecksum ());
 				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
@@ -302,7 +304,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
-
 		if (Input.GetKeyUp (KeyCode.S)) {
 			var stateBuilder = new GameStateStringBuilderImpl ();
 			SaveState (stateBuilder);
@@ -345,8 +346,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 				}
 
 			}
-
-		//	commandList.IsReady = true;
+				
 		} else {
 		
 			// playback...
@@ -357,7 +357,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 			gameFixedUpdate.Update (Time.deltaTime);
 
-			_replay.ReplayCommands ();
+//			_replay.ReplayCommands ();
 		}
 	}
 		
@@ -376,18 +376,11 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	public void GameUpdate (float dt, int frame)
 	{
-		// Debug.Log ("Timestep: " + frame);
-
-		// add empty command each fixed step just in case...
-
 		if (_commandSender.IsReady ())
 			_commandSender.SendCommands ();
 
 		_replay.GameUpdate (dt, frame);
 
-//		_replay.Update (frame);
-
-		// update game state...
 		unit.Unit.GameUpdate (dt, frame);
 	}
 
