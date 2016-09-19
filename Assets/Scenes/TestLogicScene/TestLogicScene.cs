@@ -92,7 +92,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		commandList = new CommandsList();
 
-		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (_gameStateBuilder, this));
+//		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (_gameStateBuilder, this));
 
 		// TODO: set replay....
 
@@ -104,14 +104,16 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
 
+		var checksumProvider = new GameStateChecksumProvider (_gameStateBuilder, this);
+
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
-		checksumRecorderDebug.checksumRecorder = checksumRecorder;
+		checksumRecorderDebug.checksumRecorder = new ChecksumRecorder(checksumProvider);
 
 		_commandSender = new CommandQueueBase (gameFixedUpdate, this);
 
 		ResetGameState ();
 
-		_replay = new ReplayController (gameFixedUpdate, checksumRecorder, recorderView, commandList);
+		_replay = new ReplayController (gameFixedUpdate, checksumProvider, recorderView, commandList);
 		_replay.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
 
 		StartRecording ();

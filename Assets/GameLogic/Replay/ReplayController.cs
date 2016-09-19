@@ -10,20 +10,71 @@ public interface ReplayView
 
 	void SetReplay (ReplayController replayController);
 }
-	
+
+public interface Replay
+{
+	// GameState GetInitialGameStateState();
+
+	List<StoredChecksum> StoredChecksums { get; }
+
+	void RecordChecksum(int frame);
+
+	void GetStoredCommands (int frame, List<Command> commands);
+
+	void Record (float time, int frame, Command command);
+}
+
+public class ReplayBase : Replay
+{
+	readonly CommandsRecorder _commandsRecorder;
+
+	readonly ChecksumRecorder _checksumRecorder;
+
+	public ReplayBase(ChecksumProvider checksumProvider)
+	{
+		_commandsRecorder = new CommandsRecorder();
+		_checksumRecorder = new ChecksumRecorder(checksumProvider);
+	}
+
+	#region Replay implementation
+
+	public List<StoredChecksum> StoredChecksums {
+		get {
+			return _checksumRecorder.StoredChecksums;
+		}
+	}
+
+	public void GetStoredCommands (int frame, List<Command> commands)
+	{
+		_commandsRecorder.GetCommandsForFrame (frame, commands);
+	}
+
+	public void RecordChecksum (int frame)
+	{
+		_checksumRecorder.RecordState (frame);
+	}
+
+	public void Record (float time, int frame, Command command)
+	{
+		_commandsRecorder.AddCommand (time, frame, command);
+	}
+
+	#endregion
+}
+
 public class ReplayController : GameLogic
 {
 	readonly GameFixedUpdate _gameFixedUpdate;
 
-	readonly CommandsRecorder _commandsRecorder;
+	readonly Replay _replay;
 
 	readonly ReplayView _recorderView;
-
-	readonly ChecksumRecorder _checksumRecorder;
 
 	readonly Commands _commands;
 
 	ChecksumValidator _checksumValidator;
+
+	ChecksumProvider _checksumProvider;
 
 	bool _recording;
 
@@ -53,12 +104,15 @@ public class ReplayController : GameLogic
 		}
 	}
 
-	public ReplayController(GameFixedUpdate gameFixedUpdate, ChecksumRecorder checksumRecorder, ReplayView recorderView, Commands commands)
+	public ReplayController(GameFixedUpdate gameFixedUpdate, ChecksumProvider checksumProvider, ReplayView recorderView, Commands commands)
 	{
 		_recording = true;
 		_lastRecordedGameFrame = 0;
-		_commandsRecorder = new CommandsRecorder ();
-		_checksumRecorder = checksumRecorder;
+
+		_checksumProvider = checksumProvider;
+
+		_replay = new ReplayBase (checksumProvider);
+
 		_gameFixedUpdate = gameFixedUpdate;
 		_recorderView = recorderView;
 		_commands = commands;
@@ -74,7 +128,7 @@ public class ReplayController : GameLogic
 		if (_recorderView != null)
 			_recorderView.StartPlayback ();
 
-		_checksumValidator = new ChecksumValidatorBasic (_checksumRecorder.StoredChecksums);
+		_checksumValidator = new ChecksumValidatorBasic (_replay.StoredChecksums);
 	}
 
 	public void StartRecording()
@@ -99,7 +153,7 @@ public class ReplayController : GameLogic
 
 		for (int i = 0; i < _commandsToRecord.Count; i++) {
 			var command = _commandsToRecord [i];
-			_commandsRecorder.AddCommand (_gameFixedUpdate.GameTime, _gameFixedUpdate.CurrentGameFrame, command);
+			_replay.Record (_gameFixedUpdate.GameTime, _gameFixedUpdate.CurrentGameFrame, command);
 		}
 
 		_commandsToRecord.Clear ();
@@ -114,7 +168,7 @@ public class ReplayController : GameLogic
 	{
 		List<Command> recordedCommands = new List<Command> ();
 
-		_commandsRecorder.GetCommandsForFrame(_gameFixedUpdate.CurrentGameFrame, recordedCommands);
+		_replay.GetStoredCommands(_gameFixedUpdate.CurrentGameFrame, recordedCommands);
 
 		for (int i = 0; i < recordedCommands.Count; i++) {
 			var command = recordedCommands [i];
@@ -132,22 +186,21 @@ public class ReplayController : GameLogic
 	#region GameLogic implementation
 	public void GameUpdate (float dt, int frame)
 	{
-		ChecksumProvider checksumProvider = _checksumRecorder.ChecksumProvider;
-
 		if (_recording) {
 			RecordCommands ();
 
 			_lastRecordedGameFrame = _gameFixedUpdate.CurrentGameFrame;
 
 			if (IsChecksumFrame (frame)) {
-				_checksumRecorder.RecordState (frame);
+				_replay.RecordChecksum (frame);
+				//				_checksumRecorder.RecordState (frame);
 			}
 		} else {
 
 			ReplayCommands ();
 
 			if (IsChecksumFrame (frame)) {
-				bool validState = _checksumValidator.IsValid (frame, checksumProvider.CalculateChecksum ());
+				bool validState = _checksumValidator.IsValid (frame, _checksumProvider.CalculateChecksum ());
 				#if DEBUG
 				Debug.Log (string.Format ("State({0}): is {1}", frame, validState ? "valid" : "invalid!"));
 				#endif
