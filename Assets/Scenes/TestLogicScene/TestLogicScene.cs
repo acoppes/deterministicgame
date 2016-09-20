@@ -29,7 +29,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	public RecorderViewCanvas recorderView;
 
-	ReplayController _replay;
+	ReplayController _replayController;
 
 	CommandQueue _commandSender;
 
@@ -113,8 +113,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		ResetGameState ();
 
-		_replay = new ReplayController (gameFixedUpdate, checksumProvider, recorderView, commandList);
-		_replay.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
+		_replayController = new ReplayController (gameFixedUpdate, checksumProvider, recorderView, commandList);
+		_replayController.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
 
 		StartRecording ();
 
@@ -141,7 +141,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	public void ToggleRecording()
 	{
-		if (_replay.IsRecording) {
+		if (_replayController.IsRecording) {
 			StartPlayback ();
 		} else {
 			StartRecording ();
@@ -150,7 +150,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	void StartRecording()
 	{
-		_replay.StartRecording ();
+		_replayController.StartRecording ();
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.GetComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.Reset ();
@@ -159,7 +159,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 	void StartPlayback()
 	{
 		ResetGameState ();
-		_replay.StartPlayback ();
+		_replayController.StartPlayback ();
 	}
 	
 	// Update is called once per frame
@@ -187,7 +187,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			return;
 		}
 
-		if (_replay.IsRecording) {
+		if (_replayController.IsRecording) {
 
 			gameFixedUpdate.Update (Time.deltaTime);
 
@@ -216,7 +216,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			// playback...
 
 			// if already at last frame, then dont update anymore...
-			if (_replay.IsFinished())
+			if (_replayController.IsFinished())
 				return;
 
 			gameFixedUpdate.Update (Time.deltaTime);
@@ -243,7 +243,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		if (_commandSender.IsReady ())
 			_commandSender.SendCommands ();
 
-		_replay.GameUpdate (dt, frame);
+		_replayController.GameUpdate (dt, frame);
 
 		unit.Unit.GameUpdate (dt, frame);
 	}
