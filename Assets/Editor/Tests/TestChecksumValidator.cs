@@ -20,28 +20,30 @@ public class TestChecksumValidator {
 	[Test]
 	public void LockstepTurnShouldNotAdvanceIfWaitingForActions(){
 		
-		ChecksumValidator gameStateValidator = new ChecksumValidatorBasic (new List<StoredChecksum>() {
-			{ 
-				new StoredChecksum() {
-					gameFrame = 0,
-					checksum = new ChecksumString("ABC1234")
-				}
-			}, 
+		var storedChecksums = new List<StoredChecksum> () {
 			{
-				new StoredChecksum() {
+				new StoredChecksum () {
+					gameFrame = 0,
+					checksum = new ChecksumString ("ABC1234")
+				}
+			},
+			{
+				new StoredChecksum () {
 					gameFrame = 1,
-					checksum = new ChecksumString("BOB3322")
-				} 
+					checksum = new ChecksumString ("BOB3322")
+				}
 			}
-		});
+		};
+
+		ChecksumValidator gameStateValidator = new ChecksumValidatorBasic ();
 	
 		// invalid checksum in valid frame
-		Assert.That(gameStateValidator.IsValid (0, new ChecksumString("DBC1231")), Is.False);
+		Assert.That(gameStateValidator.IsValid (0, new ChecksumString("DBC1231"), storedChecksums), Is.False);
 		// valid checksum in same frame
-		Assert.That(gameStateValidator.IsValid (0, new ChecksumString("ABC1234")), Is.True);
+		Assert.That(gameStateValidator.IsValid (0, new ChecksumString("ABC1234"), storedChecksums), Is.True);
 		// valid checksum but on invalid frame
-		Assert.That(gameStateValidator.IsValid (1, new ChecksumString("ABC1234")), Is.False);
+		Assert.That(gameStateValidator.IsValid (1, new ChecksumString("ABC1234"), storedChecksums), Is.False);
 		// valid checksum in same frame
-		Assert.That(gameStateValidator.IsValid (1, new ChecksumString("BOB3322")), Is.True);
+		Assert.That(gameStateValidator.IsValid (1, new ChecksumString("BOB3322"), storedChecksums), Is.True);
 	}
 }

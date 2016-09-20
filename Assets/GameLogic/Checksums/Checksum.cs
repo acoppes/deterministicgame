@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Gemserk.Lockstep 
 {
 	public interface ChecksumProvider
@@ -22,6 +24,6 @@ namespace Gemserk.Lockstep
 
 	public interface ChecksumValidator
 	{
-		bool IsValid(int gameFrame, Checksum checksum);
+		bool IsValid(int gameFrame, Checksum checksum, List<StoredChecksum> checksums);
 	}
 }
