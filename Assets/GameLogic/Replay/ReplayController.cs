@@ -87,8 +87,6 @@ public class ReplayController : GameLogic
 
 	readonly Commands _commands;
 
-//	readonly ChecksumProvider _checksumProvider;
-
 	bool _recording;
 
 	int gameFramesPerChecksumCheck = 10;
@@ -119,8 +117,6 @@ public class ReplayController : GameLogic
 	{
 		_recording = true;
 
-//		_checksumProvider = checksumProvider;
-
 		_replay = new ReplayBase (checksumProvider);
 
 		_gameFixedUpdate = gameFixedUpdate;
@@ -131,7 +127,7 @@ public class ReplayController : GameLogic
 			_recorderView.SetReplay (this);
 
 		_replayRecorder = new ReplayRecorder (_replay, _commands);
-		_replayPlayer = new ReplayPlayer (checksumProvider, _commands);
+		_replayPlayer = new ReplayPlayer (_replay, checksumProvider, _commands);
 	}
 
 	public void StartPlayback()
@@ -186,25 +182,13 @@ public class ReplayPlayer
 
 	readonly ChecksumProvider _checksumProvider;
 
-	int gameFramesPerChecksumCheck = 10;
+	readonly ChecksumValidator _checksumValidator;
 
-	ChecksumValidator _checksumValidator;
-
-	public int GameFramesPerChecksumCheck {
-		get {
-			return gameFramesPerChecksumCheck;
-		}
-		set {
-			gameFramesPerChecksumCheck = value;
-		}
-	}
-
-	public ReplayPlayer(ChecksumProvider checksumProvider, Commands commands)
+	public ReplayPlayer(Replay replay, ChecksumProvider checksumProvider, Commands commands)
 	{
+		_replay = replay;
 		_checksumProvider = checksumProvider;
-		_replay = new ReplayBase (checksumProvider);
 		_commands = commands;
-
 		_checksumValidator = new ChecksumValidatorBasic ();
 	}
 
