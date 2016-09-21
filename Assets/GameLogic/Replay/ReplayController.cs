@@ -21,6 +21,12 @@ namespace Gemserk.Lockstep
 
 		int gameFramesPerChecksumCheck = 10;
 
+		public Replay Replay {
+			get {
+				return _replay;
+			}
+		}
+
 		public int GameFramesPerChecksumCheck {
 			get {
 				return gameFramesPerChecksumCheck;
