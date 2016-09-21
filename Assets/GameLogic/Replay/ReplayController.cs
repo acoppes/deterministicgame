@@ -100,7 +100,7 @@ namespace Gemserk.Lockstep
 			bool isChecksumFrame = IsChecksumFrame (frame);
 
 			if (_recording) {
-				_replayRecorder.Record (_gameFixedUpdate.GameTime, _gameFixedUpdate.CurrentGameFrame, isChecksumFrame);
+				_replayRecorder.Record (_gameFixedUpdate.CurrentGameFrame, isChecksumFrame);
 			} else {
 				_replayPlayer.Replay (_gameFixedUpdate.CurrentGameFrame);
 

@@ -16,7 +16,7 @@ namespace Gemserk.Lockstep
 			
 		readonly List<Command> _commandsToRecord = new List<Command>();
 
-		void RecordCommands(float time, int frame)
+		void RecordCommands(int frame)
 		{
 			_commandsToRecord.Clear ();
 
@@ -30,9 +30,9 @@ namespace Gemserk.Lockstep
 			_commandsToRecord.Clear ();
 		}
 			
-		public void Record (float time, int frame, bool isChecksumFrame)
+		public void Record (int frame, bool isChecksumFrame)
 		{
-			RecordCommands (time, frame);
+			RecordCommands (frame);
 
 			if (isChecksumFrame)
 				_replay.RecordChecksum (frame);
