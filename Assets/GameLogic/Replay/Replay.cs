@@ -18,6 +18,6 @@ namespace Gemserk.Lockstep
 
 		void RecordChecksum(int frame);
 
-		void Record (float time, int frame, Command command);
+		void Record (int frame, Command command);
 	}
 }

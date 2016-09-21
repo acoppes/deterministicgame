@@ -7,17 +7,15 @@ namespace Gemserk.Lockstep
 		public class RecordedCommand
 		{
 			public Command command;
-			public float gameTime;
 			public int gameFrame;
 		}
 
 		readonly List<RecordedCommand> recordedCommandsQueue = new List<RecordedCommand>();
 
-		public void AddCommand(float gameTime, int gameFrame, Command command)
+		public void AddCommand(int gameFrame, Command command)
 		{
 			recordedCommandsQueue.Add (new RecordedCommand () { 
 				command = command,
-				gameTime = gameTime,
 				gameFrame = gameFrame
 			});
 		}

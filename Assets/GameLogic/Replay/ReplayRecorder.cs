@@ -24,7 +24,7 @@ namespace Gemserk.Lockstep
 
 			for (int i = 0; i < _commandsToRecord.Count; i++) {
 				var command = _commandsToRecord [i];
-				_replay.Record (time, frame, command);
+				_replay.Record (frame, command);
 			}
 
 			_commandsToRecord.Clear ();

@@ -37,9 +37,9 @@ namespace Gemserk.Lockstep
 			_checksumRecorder.RecordState (frame);
 		}
 
-		public void Record (float time, int frame, Command command)
+		public void Record (int frame, Command command)
 		{
-			_commandsRecorder.AddCommand (time, frame, command);
+			_commandsRecorder.AddCommand (frame, command);
 			LastRecordedFrame = frame;
 		}
 
