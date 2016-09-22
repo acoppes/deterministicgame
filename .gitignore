@@ -48,7 +48,9 @@ pool-manager-*.csv
 GemserkLockstep/Properties/
 GemserkLockstep/bin/
 GemserkLockstep/lib/
+!GemserkLockstep/GemserkLockstep.csproj
 
 GemserkLockstepTests/Properties/
 GemserkLockstepTests/bin/
 GemserkLockstepTests/lib/
+!GemserkLockstepTests/GemserkLockstepTests.csproj

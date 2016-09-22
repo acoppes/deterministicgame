@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{143F4678-A02F-4C5F-BA41-6C5B14A9FE4E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Gemserk.Lockstep</RootNamespace>
+    <AssemblyName>GemserkLockstep</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="xcopy /Y &quot;${TargetPath}&quot;  &quot;..\Assets\GemserkLockstep\&quot;" />
+        <Command type="AfterBuild" command="xcopy /Y &quot;${TargetPath}&quot;  &quot;..\..\tinywarriors\Assets\Gemserk\&quot;" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GameLogic\GameFixedUpdate.cs" />
+    <Compile Include="GameLogic\GameLogic.cs" />
+    <Compile Include="GameLogic\Checksums\Checksum.cs" />
+    <Compile Include="GameLogic\Checksums\ChecksumHelper.cs" />
+    <Compile Include="GameLogic\Checksums\ChecksumRecorder.cs" />
+    <Compile Include="GameLogic\Checksums\ChecksumString.cs" />
+    <Compile Include="GameLogic\Checksums\ChecksumValidatorBasic.cs" />
+    <Compile Include="GameLogic\Commands\Command.cs" />
+    <Compile Include="GameLogic\Commands\CommandBase.cs" />
+    <Compile Include="GameLogic\Commands\CommandProcessor.cs" />
+    <Compile Include="GameLogic\Commands\CommandProcessorList.cs" />
+    <Compile Include="GameLogic\Commands\CommandQueue.cs" />
+    <Compile Include="GameLogic\Commands\Commands.cs" />
+    <Compile Include="GameLogic\Commands\CommandsList.cs" />
+    <Compile Include="GameLogic\Commands\CommandsListLockstepLogic.cs" />
+    <Compile Include="GameLogic\Commands\CommandsRecorder.cs" />
+    <Compile Include="GameLogic\GameState\GameState.cs" />
+    <Compile Include="GameLogic\GameState\GameStateBuilder.cs" />
+    <Compile Include="GameLogic\GameState\GameStateChecksumProvider.cs" />
+    <Compile Include="GameLogic\GameState\GameStateProvider.cs" />
+    <Compile Include="GameLogic\GameState\GameStateStringBuilderImpl.cs" />
+    <Compile Include="GameLogic\Lockstep\LockstepFixedUpdate.cs" />
+    <Compile Include="GameLogic\Lockstep\LockstepLogic.cs" />
+    <Compile Include="GameLogic\Replay\Replay.cs" />
+    <Compile Include="GameLogic\Replay\ReplayBase.cs" />
+    <Compile Include="GameLogic\Replay\ReplayController.cs" />
+    <Compile Include="GameLogic\Replay\ReplayPlayer.cs" />
+    <Compile Include="GameLogic\Replay\ReplayRecorder.cs" />
+    <Compile Include="GameLogic\Replay\ReplayView.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
