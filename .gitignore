@@ -45,6 +45,10 @@ data-processor/.idea/
 data-session-*
 pool-manager-*.csv
 
-UnsafeCode/UnsafeCode/Properties/
-UnsafeCode/UnsafeCode/bin/
-UnsafeCode/UnsafeCode/lib/
+GemserkLockstep/Properties/
+GemserkLockstep/bin/
+GemserkLockstep/lib/
+
+GemserkLockstepTests/Properties/
+GemserkLockstepTests/bin/
+GemserkLockstepTests/lib/
