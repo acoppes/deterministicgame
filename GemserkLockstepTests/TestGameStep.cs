@@ -6,7 +6,13 @@ public class TestGameStep {
 	public class GameStepEngineMock : GameLogic
 	{
 		public float lastDt;
-		public int lastFrame;
+		public int lastFrame = -1;
+
+		public int UpdateTimes {
+			get { 
+				return lastFrame + 1;
+			}
+		}
 
 		#region GameStepEngine implementation
 		public void GameUpdate (float dt, int frame)

@@ -2,6 +2,7 @@
 using NSubstitute;
 using Gemserk.Lockstep;
 
+
 public class TestLockstepLogic {
 
 	[Test]
@@ -104,6 +105,7 @@ public class TestLockstepLogic {
 		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (7), Is.EqualTo (true));
 		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (8), Is.EqualTo (false));
 	}
+
 		
 }
 

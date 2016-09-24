@@ -42,6 +42,7 @@
     <Compile Include="TestGameStateProvider.cs" />
     <Compile Include="TestGameStep.cs" />
     <Compile Include="TestLockstepLogic.cs" />
+    <Compile Include="TestGameFixedUpdate.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
