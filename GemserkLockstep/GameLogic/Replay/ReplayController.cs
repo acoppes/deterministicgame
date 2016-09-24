@@ -49,13 +49,15 @@ namespace Gemserk.Lockstep
 			}
 		}
 
-		public ReplayController(GameFixedUpdate gameFixedUpdate, ChecksumProvider checksumProvider, ReplayView recorderView, Commands commands)
+		public ReplayController(GameFixedUpdate gameFixedUpdate, ChecksumProvider checksumProvider, ReplayView recorderView, Commands commands, Replay replay)
 		{
 			_recording = true;
 
 			_checksumProvider = checksumProvider;
 
-			_replay = new ReplayBase (checksumProvider);
+			_replay = replay;
+
+//			_replay = new ReplayBase (checksumProvider);
 
 			_gameFixedUpdate = gameFixedUpdate;
 			_recorderView = recorderView;
@@ -92,7 +94,7 @@ namespace Gemserk.Lockstep
 
 		public bool IsFinished()
 		{
-			return _replay.LastRecordedFrame == _gameFixedUpdate.CurrentGameFrame;
+			return _replay.LastRecordedFrame <= _gameFixedUpdate.CurrentGameFrame;
 		}
 
 		bool IsChecksumFrame(int frame)

@@ -2,6 +2,48 @@
 using System.Collections.Generic;
 using Gemserk.Lockstep;
 
+public class MyCustomReplay : ReplayBase
+{
+	public class StoredGameState
+	{
+		public int frame;
+		public GameState gameState;
+	}
+
+	List<StoredGameState> storedGameStates = new List<StoredGameState> ();
+
+	GameStateBuilder _gameStateBuilder;
+
+	public MyCustomReplay(ChecksumProvider checksumProvider, GameStateBuilder gameStateBuilder) : base(checksumProvider)
+	{
+		_gameStateBuilder = gameStateBuilder;
+	}
+
+	public override void RecordChecksum (int frame)
+	{
+		base.RecordChecksum (frame);
+		SaveGameState (frame, _gameStateBuilder.GetGameState ());
+	}
+
+	void SaveGameState(int frame, GameState gameState)
+	{
+		storedGameStates.Add (new StoredGameState () { 
+			frame = frame,
+			gameState = gameState
+		});
+	}
+
+	public GameState GetStoredGameState(int frame)
+	{
+		for (int i = 0; i < storedGameStates.Count; i++) {
+			var storedGameState = storedGameStates [i];
+			if (storedGameState.frame == frame)
+				return storedGameState.gameState;
+		}
+		return null;
+	}
+}
+
 public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandSender {
 
 	public class MoveCommand : CommandBase
@@ -39,7 +81,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	ChecksumProvider _checksumProvider;
 
-	[Range(1, 4)]
+	[Range(1, 16)]
 	public int replayPlaybackSpeedMultiplier = 1;
 
 	#region GameStateProvider implementation
@@ -109,7 +151,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
 
-		_checksumProvider= new GameStateChecksumProvider (_gameStateBuilder, this);
+		_checksumProvider = new GameStateChecksumProvider (_gameStateBuilder, this);
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = new ChecksumRecorder(_checksumProvider);
@@ -118,7 +160,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		ResetGameState ();
 
-		_replayController = new ReplayController (gameFixedUpdate, _checksumProvider, recorderView, commandList);
+		_replayController = new ReplayController (gameFixedUpdate, _checksumProvider, recorderView, commandList, new MyCustomReplay(_checksumProvider, _gameStateBuilder));
 		_replayController.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
 
 		StartRecording ();
@@ -250,33 +292,30 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		if (_commandSender.IsReady ())
 			_commandSender.SendCommands ();
 
-		_replayController.GameUpdate (dt, frame);
-	
 		if (!_replayController.IsRecording) {
 			var isValid = _checkumValidator.IsValid (frame, _checksumProvider.CalculateChecksum (), _replayController.Replay.StoredChecksums);
 
 			if (isValid)
 				Debug.LogFormat ("State for frame {0} is: {1}", frame, "VALID");
-			else 
+			else { 
 				Debug.LogWarningFormat ("State for frame {0} is: {1}", frame, "INVALID");
-			
-//			var storedChecksums = _replayController.Replay.StoredChecksums;
-//
-//			for (int i = 0; i < storedChecksums.Count; i++) {
-//				var storedChecksum = storedChecksums [i];
-//				if (storedChecksum.gameFrame == frame) {
-//					var isValid = _checksumProvider.CalculateChecksum ().IsEqual (storedChecksum.checksum);
-//					if (isValid)
-//						Debug.LogFormat ("State for frame {0} is: {1}", frame, "VALID");
-//					else 
-//						Debug.LogWarningFormat ("State for frame {0} is: {1}", frame, "INVALID");
-//				}
-//			}
+
+				var myCustomReplay = _replayController.Replay as MyCustomReplay;
+
+				var storedGameState = myCustomReplay.GetStoredGameState (frame) as GameStateStringImpl;
+				var currentGameState = _gameStateBuilder.GetGameState () as GameStateStringImpl;
+
+				Debug.LogWarningFormat ("Stored gamestate: {0}", storedGameState.State);
+				Debug.LogWarningFormat ("Current gamestate: {0}", currentGameState.State);
+
+			}
+			//			var storedChecksums = _replayController.Replay.StoredChecksums;
+
 		}
 
-//		if (isChecksumFrame) {
-//			bool validState = _checksumValidator.IsValid (frame, _checksumProvider.CalculateChecksum (), _replay.StoredChecksums);
-//		}
+		_replayController.GameUpdate (dt, frame);
+	
+
 
 		unit.Unit.GameUpdate (dt, frame);
 	}
