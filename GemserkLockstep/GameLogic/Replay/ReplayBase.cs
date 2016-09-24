@@ -32,7 +32,7 @@ namespace Gemserk.Lockstep
 			_commandsRecorder.GetCommandsForFrame (frame, commands);
 		}
 
-		public void RecordChecksum (int frame)
+		public virtual void RecordChecksum (int frame)
 		{
 			_checksumRecorder.RecordState (frame);
 		}
