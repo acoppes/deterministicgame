@@ -2,7 +2,6 @@
 using NSubstitute;
 using Gemserk.Lockstep;
 
-
 public class TestLockstepLogic {
 
 	[Test]
@@ -81,11 +80,19 @@ public class TestLockstepLogic {
 		lockstepGameLogic.Update (0.1f);
 		lockstepGameLogic.Update (0.1f);
 
+		// didnt process lockstep turn yet
+		lockstepLogic.DidNotReceive ().IsReady (Arg.Any<int> ());
+		lockstepLogic.DidNotReceive ().Process (Arg.Any<int> ());
+
 		Assert.That (lockstepGameLogic.IsLockstepTurn(), Is.True);
 
+		lockstepLogic.ClearReceivedCalls ();
+
+		// if update to low, then even if it is lockstep turn, it didnt process it 
 		lockstepGameLogic.Update (0.002f);
 
-		Assert.That (lockstepGameLogic.IsLockstepTurn(), Is.False);
+		lockstepLogic.DidNotReceive ().IsReady (Arg.Any<int> ());
+		lockstepLogic.DidNotReceive ().Process (Arg.Any<int> ());
 	}
 
 	[Test]
@@ -104,6 +111,26 @@ public class TestLockstepLogic {
 		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (3), Is.EqualTo (true));
 		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (7), Is.EqualTo (true));
 		Assert.That (lockstepGameLogic.IsLastFrameForNextLockstep (8), Is.EqualTo (false));
+	}
+
+	[Test]
+	public void TestProcessCallsWhenBigUpdateTime(){
+
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
+
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+
+		lockstepGameLogic.FixedStepTime = 0.1f;
+		lockstepGameLogic.MaxAllowedFrameTime = 100.0f;
+		lockstepGameLogic.GameFramesPerLockstep = 5;
+
+		lockstepLogic.IsReady (Arg.Any<int> ()).Returns (true);
+
+		lockstepGameLogic.Update (1.2f);
+
+		lockstepLogic.Received (2).Process(Arg.Any<int>());
+
+//		lockstepLogic.Recei
 	}
 
 		

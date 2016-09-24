@@ -23,7 +23,7 @@ namespace Gemserk.Lockstep
 			set;
 		}
 
-		public override void Update (float dt)
+		protected override void FixedTimeUpdate ()
 		{
 			if (IsLockstepTurn ()) {
 			
@@ -36,7 +36,7 @@ namespace Gemserk.Lockstep
 			}
 
 			// performs basic update logic...
-			base.Update (dt);
+			base.FixedTimeUpdate ();
 		}
 
 		bool IsReady()

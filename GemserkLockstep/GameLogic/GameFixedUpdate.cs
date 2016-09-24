@@ -48,9 +48,18 @@
 
 		// fixed time step based on http://gafferongames.com/game-physics/fix-your-timestep/
 
-		const float maxAllowedFrameTime = 0.25f;
+		float maxAllowedFrameTime = 0.25f;
 
-		public virtual void Update(float dt)
+		public float MaxAllowedFrameTime {
+			get {
+				return maxAllowedFrameTime;
+			}
+			set {
+				maxAllowedFrameTime = value;
+			}
+		}
+
+		public void Update(float dt)
 		{
 			if (dt > maxAllowedFrameTime)
 				dt = maxAllowedFrameTime;
@@ -59,11 +68,16 @@
 			_gameTime += dt;
 
 			while (_accumulatedTime >= _fixedStepTime) {
-				if (_gameLogic != null)
-					_gameLogic.GameUpdate (_fixedStepTime, _currentGameFrame);
-				_currentGameFrame++;
+				FixedTimeUpdate ();
 				_accumulatedTime -= _fixedStepTime;
 			}
+		}
+
+		protected virtual void FixedTimeUpdate()
+		{
+			if (_gameLogic != null)
+				_gameLogic.GameUpdate (_fixedStepTime, _currentGameFrame);
+			_currentGameFrame++;
 		}
 	}
 }
