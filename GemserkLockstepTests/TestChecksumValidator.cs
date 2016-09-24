@@ -18,7 +18,7 @@ public class TestChecksumValidator {
 	}
 
 	[Test]
-	public void LockstepTurnShouldNotAdvanceIfWaitingForActions(){
+	public void TestChecksumValidator1(){
 		
 		var storedChecksums = new List<StoredChecksum> () {
 			{
@@ -45,5 +45,22 @@ public class TestChecksumValidator {
 		Assert.That(gameStateValidator.IsValid (1, new ChecksumString("ABC1234"), storedChecksums), Is.False);
 		// valid checksum in same frame
 		Assert.That(gameStateValidator.IsValid (1, new ChecksumString("BOB3322"), storedChecksums), Is.True);
+	}
+
+	[Test]
+	public void ChecksumForFrameWithoutStoredChecksumShouldBeValid(){
+
+		var storedChecksums = new List<StoredChecksum> () {
+			{
+				new StoredChecksum () {
+					gameFrame = 5,
+					checksum = new ChecksumString ("ABC1234")
+				}
+			},
+		};
+
+		ChecksumValidator gameStateValidator = new ChecksumValidatorBasic ();
+
+		Assert.That(gameStateValidator.IsValid (0, new ChecksumString("DBC1231"), storedChecksums), Is.True);
 	}
 }

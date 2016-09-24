@@ -11,7 +11,8 @@ namespace Gemserk.Lockstep
 				if (_checksum.gameFrame == gameFrame)
 					return _checksum.checksum.IsEqual (checksum);
 			}
-			return false;
+			// if no stored checksum to validate, then current frame checksum is valid.
+			return true;
 		}
 
 	}

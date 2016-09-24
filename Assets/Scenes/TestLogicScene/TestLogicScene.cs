@@ -243,6 +243,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	#region DeterministicGameLogic implementation
 
+	readonly ChecksumValidator _checkumValidator = new ChecksumValidatorBasic();
+
 	public void GameUpdate (float dt, int frame)
 	{
 		if (_commandSender.IsReady ())
@@ -251,18 +253,25 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		_replayController.GameUpdate (dt, frame);
 	
 		if (!_replayController.IsRecording) {
-			var storedChecksums = _replayController.Replay.StoredChecksums;
+			var isValid = _checkumValidator.IsValid (frame, _checksumProvider.CalculateChecksum (), _replayController.Replay.StoredChecksums);
 
-			for (int i = 0; i < storedChecksums.Count; i++) {
-				var storedChecksum = storedChecksums [i];
-				if (storedChecksum.gameFrame == frame) {
-					var isValid = _checksumProvider.CalculateChecksum ().IsEqual (storedChecksum.checksum);
-					if (isValid)
-						Debug.LogFormat ("State for frame {0} is: {1}", frame, "VALID");
-					else 
-						Debug.LogWarningFormat ("State for frame {0} is: {1}", frame, "INVALID");
-				}
-			}
+			if (isValid)
+				Debug.LogFormat ("State for frame {0} is: {1}", frame, "VALID");
+			else 
+				Debug.LogWarningFormat ("State for frame {0} is: {1}", frame, "INVALID");
+			
+//			var storedChecksums = _replayController.Replay.StoredChecksums;
+//
+//			for (int i = 0; i < storedChecksums.Count; i++) {
+//				var storedChecksum = storedChecksums [i];
+//				if (storedChecksum.gameFrame == frame) {
+//					var isValid = _checksumProvider.CalculateChecksum ().IsEqual (storedChecksum.checksum);
+//					if (isValid)
+//						Debug.LogFormat ("State for frame {0} is: {1}", frame, "VALID");
+//					else 
+//						Debug.LogWarningFormat ("State for frame {0} is: {1}", frame, "INVALID");
+//				}
+//			}
 		}
 
 //		if (isChecksumFrame) {
