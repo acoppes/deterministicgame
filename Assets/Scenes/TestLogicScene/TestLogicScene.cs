@@ -37,6 +37,11 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	GameStateBuilder _gameStateBuilder;
 
+	ChecksumProvider _checksumProvider;
+
+	[Range(1, 4)]
+	public int replayPlaybackSpeedMultiplier = 1;
+
 	#region GameStateProvider implementation
 
 	public void SaveState (GameStateBuilder gameState)
@@ -104,16 +109,16 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
 
-		var checksumProvider = new GameStateChecksumProvider (_gameStateBuilder, this);
+		_checksumProvider= new GameStateChecksumProvider (_gameStateBuilder, this);
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
-		checksumRecorderDebug.checksumRecorder = new ChecksumRecorder(checksumProvider);
+		checksumRecorderDebug.checksumRecorder = new ChecksumRecorder(_checksumProvider);
 
 		_commandSender = new CommandQueueBase (gameFixedUpdate, this);
 
 		ResetGameState ();
 
-		_replayController = new ReplayController (gameFixedUpdate, checksumProvider, recorderView, commandList);
+		_replayController = new ReplayController (gameFixedUpdate, _checksumProvider, recorderView, commandList);
 		_replayController.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
 
 		StartRecording ();
@@ -219,7 +224,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			if (_replayController.IsFinished())
 				return;
 
-			gameFixedUpdate.Update (Time.deltaTime);
+			gameFixedUpdate.Update (Time.deltaTime * replayPlaybackSpeedMultiplier);
 
 //			_replay.ReplayCommands ();
 		}
@@ -244,6 +249,25 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 			_commandSender.SendCommands ();
 
 		_replayController.GameUpdate (dt, frame);
+	
+		if (!_replayController.IsRecording) {
+			var storedChecksums = _replayController.Replay.StoredChecksums;
+
+			for (int i = 0; i < storedChecksums.Count; i++) {
+				var storedChecksum = storedChecksums [i];
+				if (storedChecksum.gameFrame == frame) {
+					var isValid = _checksumProvider.CalculateChecksum ().IsEqual (storedChecksum.checksum);
+					if (isValid)
+						Debug.LogFormat ("State for frame {0} is: {1}", frame, "VALID");
+					else 
+						Debug.LogWarningFormat ("State for frame {0} is: {1}", frame, "INVALID");
+				}
+			}
+		}
+
+//		if (isChecksumFrame) {
+//			bool validState = _checksumValidator.IsValid (frame, _checksumProvider.CalculateChecksum (), _replay.StoredChecksums);
+//		}
 
 		unit.Unit.GameUpdate (dt, frame);
 	}
