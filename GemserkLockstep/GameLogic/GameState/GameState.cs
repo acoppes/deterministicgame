@@ -1,7 +1,7 @@
 namespace Gemserk.Lockstep 
 {
 	/// <summary>
-	/// Represents a specific state of the game.
+	/// Represents a specific state of the game, to be implemented custom in each game.
 	/// </summary>
 	public interface GameState
 	{

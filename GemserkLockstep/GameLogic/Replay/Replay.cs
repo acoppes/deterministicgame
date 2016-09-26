@@ -10,8 +10,6 @@ namespace Gemserk.Lockstep
 
 	public interface Replay
 	{
-		// GameState GetInitialGameStateState();
-
 		// For replay playback
 
 		int LastRecordedFrame { get; set; } 
@@ -26,10 +24,10 @@ namespace Gemserk.Lockstep
 
 		void Record (int frame, Command command);
 
-		// 
+		// Game state
 
-//		GameState GetInitialGameState();
-//
-//		void SaveInitialGameState(GameState gameState);
+		GameState GetInitialGameState();
+
+		void SaveInitialGameState(GameState gameState);
 	}
 }

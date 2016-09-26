@@ -8,6 +8,8 @@ namespace Gemserk.Lockstep
 
 		readonly ChecksumRecorder _checksumRecorder;
 
+		GameState _initialGameState;
+
 		public int LastRecordedFrame {
 			get;
 			set;
@@ -41,6 +43,16 @@ namespace Gemserk.Lockstep
 		{
 			_commandsRecorder.AddCommand (frame, command);
 			LastRecordedFrame = frame;
+		}
+
+		public GameState GetInitialGameState()
+		{
+			return _initialGameState;
+		}
+
+		public void SaveInitialGameState(GameState gameState)
+		{
+			_initialGameState = gameState;
 		}
 
 		#endregion
