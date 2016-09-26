@@ -8,17 +8,6 @@ namespace Gemserk.Lockstep
 		
 	}
 
-//	/// <summary>
-//	/// Basic implementation of GameState where the state is stored in a string. 
-//	/// </summary>
-//	public class GameStateStringImpl : GameState
-//	{
-//		public string State {
-//			get;
-//			set;
-//		}
-//	}
-
 	/// <summary>
 	/// Provides a clean instance of a GameState.
 	/// </summary>

@@ -61,9 +61,7 @@
     <Compile Include="GameLogic\Commands\CommandsListLockstepLogic.cs" />
     <Compile Include="GameLogic\Commands\CommandsRecorder.cs" />
     <Compile Include="GameLogic\GameState\GameState.cs" />
-    <Compile Include="GameLogic\GameState\GameStateBuilder.cs" />
     <Compile Include="GameLogic\GameState\GameStateChecksumProvider.cs" />
-    <Compile Include="GameLogic\GameState\GameStateStringBuilderImpl.cs" />
     <Compile Include="GameLogic\Lockstep\LockstepFixedUpdate.cs" />
     <Compile Include="GameLogic\Lockstep\LockstepLogic.cs" />
     <Compile Include="GameLogic\Replay\Replay.cs" />
@@ -73,6 +71,7 @@
     <Compile Include="GameLogic\Replay\ReplayRecorder.cs" />
     <Compile Include="GameLogic\Replay\ReplayView.cs" />
     <Compile Include="GameLogic\GameState\GameStateCollaborator.cs" />
+    <Compile Include="GameLogic\GameState\GameStateString.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -6,7 +6,7 @@ public class TestObject : GameStateCollaborator
 	#region GameStateProvider implementation
 	public void SaveState (GameState gameState)
 	{
-		var myCustomGameState = gameState as GameStateStringBuilderImpl;
+		var myCustomGameState = gameState as GameStateString;
 
 		myCustomGameState.StartObject ("TestObject");
 		myCustomGameState.SetInt ("x", 10);
@@ -26,7 +26,7 @@ public class TestGameStateProvider {
 
 		TestObject testObject = new TestObject ();
 
-		var gameState = new GameStateStringBuilderImpl ();
+		var gameState = new GameStateString ();
 
 		testObject.SaveState (gameState);
 		testObject.SaveState (gameState);
