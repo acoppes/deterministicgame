@@ -1,16 +1,20 @@
 using NUnit.Framework;
 using Gemserk.Lockstep;
 
-public class TestObject : GameStateProvider
+public class TestObject : GameStateCollaborator
 {
 	#region GameStateProvider implementation
-	public void SaveState (GameStateBuilder gameState)
+	public void SaveState (GameState gameState)
 	{
-		gameState.StartObject ("TestObject");
-		gameState.SetInt ("x", 10);
-		gameState.SetInt ("y", 5);
-		gameState.SetInt ("z", 20);
-		gameState.EndObject ();
+		var myCustomGameState = gameState as GameStateStringBuilderImpl;
+
+		myCustomGameState.StartObject ("TestObject");
+		myCustomGameState.SetInt ("x", 10);
+		myCustomGameState.SetInt ("y", 5);
+		myCustomGameState.SetInt ("z", 20);
+
+		myCustomGameState.EndObject ();
+
 	}
 	#endregion
 }
@@ -20,14 +24,12 @@ public class TestGameStateProvider {
 	[Test]
 	public void TestGameStateProvider1(){
 
-		GameStateStringBuilderImpl gameStateBuilder = new GameStateStringBuilderImpl ();
 		TestObject testObject = new TestObject ();
 
-		gameStateBuilder.Reset ();
-		testObject.SaveState (gameStateBuilder);
-		testObject.SaveState (gameStateBuilder);
+		var gameState = new GameStateStringBuilderImpl ();
 
-		GameStateStringImpl gameState = gameStateBuilder.GetGameState() as GameStateStringImpl;
+		testObject.SaveState (gameState);
+		testObject.SaveState (gameState);
 
 		Assert.That (gameState.State, Is.EqualTo ("TestObject:(x:10,y:5,z:20),TestObject:(x:10,y:5,z:20)"));
 	}

@@ -5,9 +5,15 @@ namespace Gemserk.Lockstep
 	// TODO: a better implementation could be to generate a tree that represents the state
 	// and then have a way to create a string or another, base don the tree representation.
 
-	public class GameStateStringBuilderImpl : GameStateBuilder
+	public class GameStateStringBuilderImpl : GameStateBuilder, GameState
 	{
 		StringBuilder state = new StringBuilder();
+
+		public string State {
+			get {
+				return state.ToString();
+			}
+		}
 
 		#region ChecksumProvider implementation
 		public Checksum CalculateChecksum ()
@@ -16,12 +22,12 @@ namespace Gemserk.Lockstep
 		}
 		#endregion
 
-		public GameState GetGameState ()
-		{
-			return new GameStateStringImpl () { 
-				State = this.state.ToString()
-			};
-		}
+//		public GameState GetGameState ()
+//		{
+//			return new GameStateStringImpl () { 
+//				State = this.state.ToString()
+//			};
+//		}
 
 		bool firstObject = true;
 		bool firstElement = true;

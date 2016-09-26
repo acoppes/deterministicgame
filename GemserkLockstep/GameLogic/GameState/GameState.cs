@@ -3,19 +3,27 @@ namespace Gemserk.Lockstep
 	/// <summary>
 	/// Represents a specific state of the game, to be implemented custom in each game.
 	/// </summary>
-	public interface GameState
+	public interface GameState : ChecksumProvider
 	{
 		
 	}
 
+//	/// <summary>
+//	/// Basic implementation of GameState where the state is stored in a string. 
+//	/// </summary>
+//	public class GameStateStringImpl : GameState
+//	{
+//		public string State {
+//			get;
+//			set;
+//		}
+//	}
+
 	/// <summary>
-	/// Basic implementation of GameState where the state is stored in a string. 
+	/// Provides a clean instance of a GameState.
 	/// </summary>
-	public class GameStateStringImpl : GameState
+	public interface GameStateProvider
 	{
-		public string State {
-			get;
-			set;
-		}
+		GameState GetGameState();
 	}
 }

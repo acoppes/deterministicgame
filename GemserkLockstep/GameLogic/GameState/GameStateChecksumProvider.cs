@@ -2,23 +2,23 @@ namespace Gemserk.Lockstep
 {
 	public class GameStateChecksumProvider : ChecksumProvider
 	{
-		readonly GameStateBuilder _gameStateBuilder;
-
 		readonly GameStateProvider _gameStateProvider;
 
-		public GameStateChecksumProvider(GameStateBuilder gameStateBuilder, GameStateProvider rootProvider)
+		readonly GameStateCollaborator _rootGameStateCollaborator;
+
+		public GameStateChecksumProvider(GameStateProvider gameStateProvider, GameStateCollaborator rootProvider)
 		{
-			_gameStateBuilder = gameStateBuilder;
-			_gameStateProvider = rootProvider;
+			_gameStateProvider = gameStateProvider;
+			_rootGameStateCollaborator = rootProvider;
 		}
 
 		#region ChecksumProvider implementation
 
 		public Checksum CalculateChecksum ()
 		{
-			_gameStateBuilder.Reset ();
-			_gameStateProvider.SaveState (_gameStateBuilder);
-			return _gameStateBuilder.CalculateChecksum ();
+			var gameState = _gameStateProvider.GetGameState ();
+			_rootGameStateCollaborator.SaveState (gameState);
+			return gameState.CalculateChecksum ();
 		}
 
 		#endregion

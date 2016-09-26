@@ -3,10 +3,8 @@ namespace Gemserk.Lockstep
 	/// <summary>
 	/// Provides a way to build a game state for saving it or checking synchronization across clients.
 	/// </summary>
-	public interface GameStateBuilder : ChecksumProvider
+	public interface GameStateBuilder
 	{
-		GameState GetGameState();
-
 		void StartObject(string name);
 
 		void EndObject();
