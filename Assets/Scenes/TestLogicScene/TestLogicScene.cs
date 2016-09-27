@@ -12,17 +12,17 @@ public class MyCustomReplay : ReplayBase
 
 	List<StoredGameState> storedGameStates = new List<StoredGameState> ();
 
-	GameStateBuilder _gameStateBuilder;
+	GameStateProvider _gameStateProvider;
 
-	public MyCustomReplay(ChecksumProvider checksumProvider, GameStateBuilder gameStateBuilder) : base(checksumProvider)
+	public MyCustomReplay(ChecksumProvider checksumProvider, GameStateProvider gameStateProvider) : base(checksumProvider)
 	{
-		_gameStateBuilder = gameStateBuilder;
+		_gameStateProvider = gameStateProvider;
 	}
 
 	public override void RecordChecksum (int frame)
 	{
 		base.RecordChecksum (frame);
-		SaveGameState (frame, _gameStateBuilder.GetGameState ());
+		SaveGameState (frame, _gameStateProvider.GetGameState());
 	}
 
 	void SaveGameState(int frame, GameState gameState)
@@ -44,7 +44,7 @@ public class MyCustomReplay : ReplayBase
 	}
 }
 
-public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, CommandProcessor, CommandSender {
+public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, CommandProcessor, CommandSender, GameStateProvider {
 
 	public class MoveCommand : CommandBase
 	{
@@ -77,8 +77,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	public int gameFramesPerChecksumCheck = 10;
 
-	GameStateBuilder _gameStateBuilder;
-
 	ChecksumProvider _checksumProvider;
 
 	[Range(1, 16)]
@@ -86,8 +84,21 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	#region GameStateProvider implementation
 
-	public void SaveState (GameStateBuilder gameState)
+	public GameState GetGameState ()
 	{
+		var gameState = new GameStateString ();
+		SaveState (gameState);
+		return gameState;
+	}
+
+	#endregion
+
+	#region GameStateProvider implementation
+
+	public void SaveState (GameState iGameState)
+	{
+		var gameState = iGameState as GameStateString;
+
 		gameState.StartObject ("Engine");
 		gameState.SetInt ("frame", gameFixedUpdate.CurrentGameFrame);
 		gameState.EndObject ();
@@ -135,8 +146,6 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 	void Awake()
 	{
-		_gameStateBuilder = new GameStateStringBuilderImpl ();
-
 		commandList = new CommandsList();
 
 //		ChecksumRecorder checksumRecorder = new ChecksumRecorder (new GameStateChecksumProvider (_gameStateBuilder, this));
@@ -151,7 +160,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		GameFixedUpdateDebug updateDebug = gameObject.AddComponent<GameFixedUpdateDebug> ();
 		updateDebug.SetGameFixedUpdate (gameFixedUpdate);
 
-		_checksumProvider = new GameStateChecksumProvider (_gameStateBuilder, this);
+		_checksumProvider = new GameStateChecksumProvider (this);
 
 		ChecksumRecorderDebug checksumRecorderDebug = gameObject.AddComponent<ChecksumRecorderDebug> ();
 		checksumRecorderDebug.checksumRecorder = new ChecksumRecorder(_checksumProvider);
@@ -160,7 +169,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 		ResetGameState ();
 
-		_replayController = new ReplayController (gameFixedUpdate, _checksumProvider, recorderView, commandList, new MyCustomReplay(_checksumProvider, _gameStateBuilder));
+		_replayController = new ReplayController (gameFixedUpdate, _checksumProvider, recorderView, commandList, new MyCustomReplay(_checksumProvider, this));
 		_replayController.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
 
 		StartRecording ();
@@ -216,9 +225,9 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 		gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
 
 		if (Input.GetKeyUp (KeyCode.S)) {
-			var stateBuilder = new GameStateStringBuilderImpl ();
-			SaveState (stateBuilder);
-			Debug.Log ((stateBuilder.GetGameState() as GameStateStringImpl).State);
+			var gameState = GetGameState ();
+			SaveState (gameState);
+			Debug.Log ((gameState as GameStateString).State);
 		}
 	
 		if (Input.GetKeyUp (KeyCode.P)) {
@@ -302,8 +311,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateProvider, Comma
 
 				var myCustomReplay = _replayController.Replay as MyCustomReplay;
 
-				var storedGameState = myCustomReplay.GetStoredGameState (frame) as GameStateStringImpl;
-				var currentGameState = _gameStateBuilder.GetGameState () as GameStateStringImpl;
+				var storedGameState = myCustomReplay.GetStoredGameState (frame) as GameStateString;
+				var currentGameState = GetGameState() as GameStateString;
 
 				Debug.LogWarningFormat ("Stored gamestate: {0}", storedGameState.State);
 				Debug.LogWarningFormat ("Current gamestate: {0}", currentGameState.State);

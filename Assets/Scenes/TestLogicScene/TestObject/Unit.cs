@@ -1,7 +1,7 @@
 using UnityEngine;
 using Gemserk.Lockstep;
 
-public class Unit : GameLogic, GameStateProvider
+public class Unit : GameLogic, GameStateCollaborator
 {
 	Vector2 _gamePosition;
 
@@ -44,8 +44,10 @@ public class Unit : GameLogic, GameStateProvider
 
 	#region GameStateProvider implementation
 
-	public void SaveState (GameStateBuilder gameState)
+	public void SaveState (GameState iGameState)
 	{
+		var gameState = iGameState as GameStateString;
+
 		gameState.StartObject ("Unit");
 		gameState.SetFloat ("position.x", _gamePosition.x);
 		gameState.SetFloat ("position.y", _gamePosition.y);
