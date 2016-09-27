@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Gemserk.Lockstep;
+using System.Text;
 
 public class MyCustomReplay : ReplayBase
 {
@@ -42,6 +43,39 @@ public class MyCustomReplay : ReplayBase
 		}
 		return null;
 	}
+}
+
+public class MyCustomGameState : GameState
+{
+	public struct UnitData 
+	{
+		public Vector2 position;
+		public Vector2 destination;
+		public float speed;
+		public bool moving;
+	}
+
+	public int currentGameFrame;
+
+	public UnitData unitData;
+
+	#region ChecksumProvider implementation
+	public Checksum CalculateChecksum ()
+	{
+		return new ChecksumString(ChecksumHelper.CalculateMD5(GetStateString()));
+	}
+	#endregion
+
+	public string GetStateString()
+	{
+		var strBuilder = new StringBuilder();
+	
+		strBuilder.Append (string.Format ("Engine:(frame:{0})", currentGameFrame));
+		strBuilder.Append (string.Format ("Unit:(position:{0}, speed:{1}, moving:{2}, destination:{3})", unitData.position, unitData.speed, unitData.moving, unitData.destination));
+	
+		return strBuilder.ToString ();
+	}
+	
 }
 
 public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, CommandProcessor, CommandSender, GameStateProvider {
@@ -86,7 +120,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 
 	public GameState GetGameState ()
 	{
-		var gameState = new GameStateString ();
+		var gameState = new MyCustomGameState ();
 		SaveState (gameState);
 		return gameState;
 	}
@@ -97,11 +131,13 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 
 	public void SaveState (GameState iGameState)
 	{
-		var gameState = iGameState as GameStateString;
+		var gameState = iGameState as MyCustomGameState;
 
-		gameState.StartObject ("Engine");
-		gameState.SetInt ("frame", gameFixedUpdate.CurrentGameFrame);
-		gameState.EndObject ();
+		gameState.currentGameFrame = gameFixedUpdate.CurrentGameFrame;
+
+//		gameState.StartObject ("Engine");
+//		gameState.SetInt ("frame", gameFixedUpdate.CurrentGameFrame);
+//		gameState.EndObject ();
 
 		unit.Unit.SaveState (gameState);
 	}
@@ -227,7 +263,7 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 		if (Input.GetKeyUp (KeyCode.S)) {
 			var gameState = GetGameState ();
 			SaveState (gameState);
-			Debug.Log ((gameState as GameStateString).State);
+			Debug.Log ((gameState as MyCustomGameState).GetStateString());
 		}
 	
 		if (Input.GetKeyUp (KeyCode.P)) {
@@ -311,11 +347,11 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 
 				var myCustomReplay = _replayController.Replay as MyCustomReplay;
 
-				var storedGameState = myCustomReplay.GetStoredGameState (frame) as GameStateString;
-				var currentGameState = GetGameState() as GameStateString;
+				var storedGameState = myCustomReplay.GetStoredGameState (frame) as MyCustomGameState;
+				var currentGameState = GetGameState() as MyCustomGameState;
 
-				Debug.LogWarningFormat ("Stored gamestate: {0}", storedGameState.State);
-				Debug.LogWarningFormat ("Current gamestate: {0}", currentGameState.State);
+				Debug.LogWarningFormat ("Stored gamestate: {0}", storedGameState.GetStateString());
+				Debug.LogWarningFormat ("Current gamestate: {0}", currentGameState.GetStateString());
 
 			}
 			//			var storedChecksums = _replayController.Replay.StoredChecksums;

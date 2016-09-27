@@ -46,16 +46,14 @@ public class Unit : GameLogic, GameStateCollaborator
 
 	public void SaveState (GameState iGameState)
 	{
-		var gameState = iGameState as GameStateString;
+		var gameState = iGameState as MyCustomGameState;
 
-		gameState.StartObject ("Unit");
-		gameState.SetFloat ("position.x", _gamePosition.x);
-		gameState.SetFloat ("position.y", _gamePosition.y);
-		gameState.SetFloat ("speed", speed);
-		gameState.SetBool ("moving", _moving);
-		gameState.SetFloat ("destination.x", _destination.x);
-		gameState.SetFloat ("destination.y", _destination.y);
-		gameState.EndObject ();
+		gameState.unitData = new MyCustomGameState.UnitData () { 
+			position = _gamePosition,
+			speed = speed,
+			moving = _moving,
+			destination = _destination
+		};
 	}
 
 	#endregion
