@@ -1,82 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Gemserk.Lockstep;
-using System.Text;
-
-public class MyCustomReplay : ReplayBase
-{
-	public class StoredGameState
-	{
-		public int frame;
-		public GameState gameState;
-	}
-
-	List<StoredGameState> storedGameStates = new List<StoredGameState> ();
-
-	GameStateProvider _gameStateProvider;
-
-	public MyCustomReplay(ChecksumProvider checksumProvider, GameStateProvider gameStateProvider) : base(checksumProvider)
-	{
-		_gameStateProvider = gameStateProvider;
-	}
-
-	public override void RecordChecksum (int frame)
-	{
-		base.RecordChecksum (frame);
-		SaveGameState (frame, _gameStateProvider.GetGameState());
-	}
-
-	void SaveGameState(int frame, GameState gameState)
-	{
-		storedGameStates.Add (new StoredGameState () { 
-			frame = frame,
-			gameState = gameState
-		});
-	}
-
-	public GameState GetStoredGameState(int frame)
-	{
-		for (int i = 0; i < storedGameStates.Count; i++) {
-			var storedGameState = storedGameStates [i];
-			if (storedGameState.frame == frame)
-				return storedGameState.gameState;
-		}
-		return null;
-	}
-}
-
-public class MyCustomGameState : GameState
-{
-	public struct UnitData 
-	{
-		public Vector2 position;
-		public Vector2 destination;
-		public float speed;
-		public bool moving;
-	}
-
-	public int currentGameFrame;
-
-	public UnitData unitData;
-
-	#region ChecksumProvider implementation
-	public Checksum CalculateChecksum ()
-	{
-		return new ChecksumString(ChecksumHelper.CalculateMD5(GetStateString()));
-	}
-	#endregion
-
-	public string GetStateString()
-	{
-		var strBuilder = new StringBuilder();
-	
-		strBuilder.Append (string.Format ("Engine:(frame:{0})", currentGameFrame));
-		strBuilder.Append (string.Format ("Unit:(position:{0}, speed:{1}, moving:{2}, destination:{3})", unitData.position, unitData.speed, unitData.moving, unitData.destination));
-	
-		return strBuilder.ToString ();
-	}
-	
-}
 
 public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, CommandProcessor, CommandSender, GameStateProvider {
 
@@ -116,6 +40,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 	[Range(1, 16)]
 	public int replayPlaybackSpeedMultiplier = 1;
 
+	Replay _replay;
+
 	#region GameStateProvider implementation
 
 	public GameState GetGameState ()
@@ -134,10 +60,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 		var gameState = iGameState as MyCustomGameState;
 
 		gameState.currentGameFrame = gameFixedUpdate.CurrentGameFrame;
-
-//		gameState.StartObject ("Engine");
-//		gameState.SetInt ("frame", gameFixedUpdate.CurrentGameFrame);
-//		gameState.EndObject ();
+		gameState.fixedDeltaTime = gameFixedUpdate.FixedStepTime;
+		gameState.gameFramesPerLockstep = gameFixedUpdate.GameFramesPerLockstep;
 
 		unit.Unit.SaveState (gameState);
 	}
@@ -205,7 +129,10 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 
 		ResetGameState ();
 
-		_replayController = new ReplayController (gameFixedUpdate, _checksumProvider, recorderView, commandList, new MyCustomReplay(_checksumProvider, this));
+		_replay = new MyCustomReplay (_checksumProvider, this);
+		_replay.SaveInitialGameState (GetGameState ());
+
+		_replayController = new ReplayController (gameFixedUpdate, _checksumProvider, recorderView, commandList, _replay);
 		_replayController.GameFramesPerChecksumCheck = gameFramesPerChecksumCheck;
 
 		StartRecording ();
@@ -223,12 +150,44 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 	void ResetGameState()
 	{
 		gameFixedUpdate.Init ();
-		unit.Unit.SetPosition (new Vector2 (0, 0));
 
-		// by default enqueues an empty command for first lockstep frame
-		commandList.AddCommand (new CommandBase () {
-			ProcessFrame = gameFixedUpdate.GetFirstLockstepFrame()
-		});
+		if (_replay == null) {
+
+			gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
+			gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
+			unit.Unit.SetPosition (new Vector2 (0, 0));
+
+			// by default enqueues an empty command for first lockstep frame
+			commandList.AddCommand (new CommandBase () {
+				ProcessFrame = gameFixedUpdate.GetFirstLockstepFrame ()
+			});
+
+		} else {
+		
+			if (_replayController.IsRecording) {
+
+				gameFixedUpdate.GameFramesPerLockstep = gameFramesPerLockstep;
+				gameFixedUpdate.FixedStepTime = fixedTimestepMilliseconds / 1000.0f;
+				unit.Unit.SetPosition (new Vector2 (0, 0));
+
+				_replay.SaveInitialGameState (GetGameState ());
+			
+			} else {
+				// load game state from replay && dont enqueue default message for first lockstep
+
+				Debug.Log ("Loading replay gamestate");
+
+				var gameState = _replay.GetInitialGameState () as MyCustomGameState;
+
+				gameFixedUpdate.FixedStepTime = gameState.fixedDeltaTime;
+				gameFixedUpdate.GameFramesPerLockstep = gameState.gameFramesPerLockstep;
+
+				unit.Unit.SetPosition (gameState.unitData.position);
+				unit.Unit.Speed = gameState.unitData.speed;
+
+				// all the other data...
+			}
+		}
 	}
 
 	public void ToggleRecording()
@@ -250,8 +209,8 @@ public class TestLogicScene : MonoBehaviour, GameLogic, GameStateCollaborator, C
 
 	void StartPlayback()
 	{
-		ResetGameState ();
 		_replayController.StartPlayback ();
+		ResetGameState ();
 	}
 	
 	// Update is called once per frame
