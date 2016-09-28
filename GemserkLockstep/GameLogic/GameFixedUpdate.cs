@@ -65,7 +65,6 @@
 				dt = maxAllowedFrameTime;
 
 			_accumulatedTime += dt;
-			_gameTime += dt;
 
 			while (_accumulatedTime >= _fixedStepTime) {
 				FixedTimeUpdate ();
@@ -77,6 +76,7 @@
 		{
 			if (_gameLogic != null)
 				_gameLogic.GameUpdate (_fixedStepTime, _currentGameFrame);
+			_gameTime += _fixedStepTime;
 			_currentGameFrame++;
 		}
 	}
