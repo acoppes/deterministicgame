@@ -42,7 +42,7 @@ public class TestLockstepLogic {
 
 		//		var gameLogic = NSubstitute.Substitute.For<DeterministicGameLogic> ();
 
-		var gameLogic = new TestGameStep.GameStepEngineMock ();
+//		var gameLogic = new TestGameStep.GameStepEngineMock ();
 
 		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
 
@@ -50,9 +50,9 @@ public class TestLockstepLogic {
 		lockstepGameLogic.GameFramesPerLockstep = 4;
 		lockstepGameLogic.FixedStepTime = 0.1f;
 
-		lockstepGameLogic.SetGameLogic (gameLogic);
+//		lockstepGameLogic.SetGameLogic (gameLogic);
 
-		lockstepLogic.IsReady (0).Returns (true);
+//		lockstepLogic.IsReady (0).Returns (true);
 
 		Assert.That (lockstepGameLogic.GetNextLockstepFrame (0), Is.EqualTo (8));
 		Assert.That (lockstepGameLogic.GetNextLockstepFrame (1), Is.EqualTo (8));
@@ -182,6 +182,25 @@ public class TestLockstepLogic {
 
 		Assert.That (lockstepGameLogic.CurrentGameFrame, Is.EqualTo (10));
 		Assert.That (lockstepGameLogic.CurrentLockstepFrame, Is.EqualTo (2));
+	}
+
+	[Test]
+	public void TestIsReadyShouldCheckForProperGameFrame(){
+
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
+
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+
+		lockstepGameLogic.FixedStepTime = 0.1f;
+		lockstepGameLogic.MaxAllowedFrameTime = 100.0f;
+		lockstepGameLogic.GameFramesPerLockstep = 5;
+
+		lockstepLogic.IsReady (Arg.Any<int> ()).ReturnsForAnyArgs(true);
+
+		lockstepGameLogic.Update (0.5f);
+
+		lockstepLogic.Received (1).IsReady(Arg.Is<int>(5));
+		lockstepLogic.Received (1).Process(Arg.Is<int>(5));
 	}
 
 

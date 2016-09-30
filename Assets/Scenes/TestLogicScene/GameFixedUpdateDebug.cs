@@ -8,6 +8,8 @@ public class GameFixedUpdateDebug : MonoBehaviour
 	public float gameTime;
 	public int gameFrame;
 
+	public int lockstepFrame;
+
 	public float fixedUpdateTime;
 	public float lockstepTime;
 
@@ -20,6 +22,7 @@ public class GameFixedUpdateDebug : MonoBehaviour
 	{
 		gameTime = _gameFixedUpdate.GameTime;
 		gameFrame = _gameFixedUpdate.CurrentGameFrame;
+		lockstepFrame = _gameFixedUpdate.CurrentLockstepFrame;
 	
 		fixedUpdateTime = _gameFixedUpdate.FixedStepTime;
 		lockstepTime = _gameFixedUpdate.GameFramesPerLockstep * fixedUpdateTime;

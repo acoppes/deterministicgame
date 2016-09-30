@@ -58,7 +58,7 @@ namespace Gemserk.Lockstep
 		bool IsReady()
 		{
 			// check for pending actions...
-			return _lockstepLogic.IsReady(CurrentGameFrame);
+			return _lockstepLogic.IsReady(CurrentGameFrame + 1);
 		}
 
 		int _lastLockstepGameFrame;
@@ -78,7 +78,7 @@ namespace Gemserk.Lockstep
 		void ProcessLockstepLogic()
 		{
 			// process pending actions..
-			_lockstepLogic.Process(CurrentGameFrame);
+			_lockstepLogic.Process(CurrentGameFrame + 1);
 		}
 
 		public int GetCurrentFrame()
