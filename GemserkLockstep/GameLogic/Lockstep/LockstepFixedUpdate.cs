@@ -47,7 +47,7 @@ namespace Gemserk.Lockstep
 
 				ProcessLockstepLogic ();
 				// Don't process same lockstep twice
-				_lastLockstepTurn = CurrentGameFrame;
+				_lastLockstepGameFrame = CurrentGameFrame;
 				_currentLockstepFrame++;
 			}
 
@@ -61,15 +61,18 @@ namespace Gemserk.Lockstep
 			return _lockstepLogic.IsReady(CurrentGameFrame);
 		}
 
-		int _lastLockstepTurn;
+		int _lastLockstepGameFrame;
 
 		public bool IsLockstepTurn() 
 		{
 			if (CurrentGameFrame == 0)
 				return false;
-			if (CurrentGameFrame == _lastLockstepTurn)
+			if (CurrentGameFrame == _lastLockstepGameFrame)
 				return false;
-			return (CurrentGameFrame % GameFramesPerLockstep) == 0;
+
+			// since the game frame is always behind one frame (current game frame wasnt processed yet)
+
+			return ((CurrentGameFrame + 1) % GameFramesPerLockstep) == 0;
 		}
 
 		void ProcessLockstepLogic()

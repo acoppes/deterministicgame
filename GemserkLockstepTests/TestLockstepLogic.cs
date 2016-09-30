@@ -75,20 +75,20 @@ public class TestLockstepLogic {
 		lockstepGameLogic.GameFramesPerLockstep = 2;
 		lockstepGameLogic.SetGameLogic (gameLogic);
 
-		lockstepLogic.IsReady (0).ReturnsForAnyArgs (true);
+		lockstepLogic.IsReady (0).ReturnsForAnyArgs (false);
 
 		lockstepGameLogic.Update (0.1f);
 		lockstepGameLogic.Update (0.1f);
 
 		// didnt process lockstep turn yet
-		lockstepLogic.DidNotReceive ().IsReady (Arg.Any<int> ());
+//		lockstepLogic.DidNotReceive ().IsReady (Arg.Any<int> ());
 		lockstepLogic.DidNotReceive ().Process (Arg.Any<int> ());
 
 		Assert.That (lockstepGameLogic.IsLockstepTurn(), Is.True);
 
 		lockstepLogic.ClearReceivedCalls ();
 
-		// if update to low, then even if it is lockstep turn, it didnt process it 
+		// if update too low, then even if it is lockstep turn, it didnt process it 
 		lockstepGameLogic.Update (0.002f);
 
 		lockstepLogic.DidNotReceive ().IsReady (Arg.Any<int> ());
@@ -158,6 +158,32 @@ public class TestLockstepLogic {
 
 		Assert.That (lockstepGameLogic.CurrentLockstepFrame, Is.EqualTo (2));
 	}
+
+	[Test]
+	public void TestProcessLockstepInProperFrame(){
+
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
+
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+
+		lockstepGameLogic.FixedStepTime = 0.1f;
+		lockstepGameLogic.MaxAllowedFrameTime = 100.0f;
+		lockstepGameLogic.GameFramesPerLockstep = 5;
+
+		lockstepLogic.IsReady (Arg.Any<int> ()).Returns (true);
+
+		lockstepGameLogic.Update (0.5f);
+
+		Assert.That (lockstepGameLogic.CurrentGameFrame, Is.EqualTo (5));
+		Assert.That (lockstepGameLogic.CurrentLockstepFrame, Is.EqualTo (1));
+
+
+		lockstepGameLogic.Update (0.5f);
+
+		Assert.That (lockstepGameLogic.CurrentGameFrame, Is.EqualTo (10));
+		Assert.That (lockstepGameLogic.CurrentLockstepFrame, Is.EqualTo (2));
+	}
+
 
 		
 }
