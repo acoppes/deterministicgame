@@ -2,9 +2,9 @@ using System.Text;
 
 namespace Gemserk.Lockstep 
 {
-	// TODO: a better implementation could be to generate a tree that represents the state
-	// and then have a way to create a string or another, base don the tree representation.
-
+	/// <summary>
+	/// This is just a basic implementation of a GameState used mainly for debug and testing, not a real implementation to be used.
+	/// </summary>
 	public class GameStateString : GameState
 	{
 		StringBuilder state = new StringBuilder();

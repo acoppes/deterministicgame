@@ -39,7 +39,7 @@
 			_gameLogic = gameLogic;
 		}
 
-		public void Init()
+		public virtual void Init()
 		{
 			_currentGameFrame = 0;
 			_accumulatedTime = 0;

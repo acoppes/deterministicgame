@@ -133,6 +133,32 @@ public class TestLockstepLogic {
 //		lockstepLogic.Recei
 	}
 
+	[Test]
+	public void TestCurrentLockstepFrame(){
+
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
+
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+
+		lockstepGameLogic.FixedStepTime = 0.1f;
+		lockstepGameLogic.MaxAllowedFrameTime = 100.0f;
+		lockstepGameLogic.GameFramesPerLockstep = 5;
+
+		lockstepLogic.IsReady (Arg.Any<int> ()).Returns (true);
+
+		lockstepGameLogic.Update (0.1f);
+
+		Assert.That (lockstepGameLogic.CurrentLockstepFrame, Is.EqualTo (0));
+
+		lockstepGameLogic.Update (0.5f);
+
+		Assert.That (lockstepGameLogic.CurrentLockstepFrame, Is.EqualTo (1));
+
+		lockstepGameLogic.Update (0.5f);
+
+		Assert.That (lockstepGameLogic.CurrentLockstepFrame, Is.EqualTo (2));
+	}
+
 		
 }
 

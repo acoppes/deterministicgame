@@ -13,6 +13,8 @@ namespace Gemserk.Lockstep
 	{
 		readonly LockstepLogic _lockstepLogic;
 
+		int _currentLockstepFrame;
+
 		public LockstepFixedUpdate(LockstepLogic lockstepLogic)
 		{
 			_lockstepLogic = lockstepLogic;
@@ -21,6 +23,19 @@ namespace Gemserk.Lockstep
 		public int GameFramesPerLockstep {
 			get;
 			set;
+		}
+
+		public int CurrentLockstepFrame
+		{
+			get { 
+				return _currentLockstepFrame;
+			}
+		}
+
+		public override void Init ()
+		{
+			base.Init ();
+			_currentLockstepFrame = 0;
 		}
 
 		protected override void FixedTimeUpdate ()
@@ -33,6 +48,7 @@ namespace Gemserk.Lockstep
 				ProcessLockstepLogic ();
 				// Don't process same lockstep twice
 				_lastLockstepTurn = CurrentGameFrame;
+				_currentLockstepFrame++;
 			}
 
 			// performs basic update logic...
