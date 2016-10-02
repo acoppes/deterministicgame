@@ -278,6 +278,11 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114000013796337612, guid: a7a0225be1bb0d3479f7b7761c67989b,
+        type: 2}
+      propertyPath: gameFramesPerLockstep
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a7a0225be1bb0d3479f7b7761c67989b, type: 2}
   m_IsPrefabParent: 0
