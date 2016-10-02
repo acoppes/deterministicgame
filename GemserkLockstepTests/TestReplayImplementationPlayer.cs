@@ -119,6 +119,11 @@ namespace Gemserk.Lockstep.Tests
 		{
 			_state = ReplayPlayerControlsState.Seeking;
 			_seekTime = seekTime;
+
+			if (_seekTime < _playbackTime) {
+				_gameReplayPlayer.Reset ();
+				_playbackTime = 0.0f;
+			}
 		}
 
 		public float GetPlaybackTime ()
@@ -270,6 +275,27 @@ namespace Gemserk.Lockstep.Tests
 			Assert.That (replayPlayer.GetPlaybackTime(), Is.EqualTo (1.8f));
 
 			Assert.That (replayPlayer.State, Is.Not.EqualTo (ReplayPlayerControlsState.Seeking));
+		}
+
+		[Test]
+		public void TestSeekResetStateIfBeforeCurrentTime()
+		{
+			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
+			gameReplay.GetMaxAllowedUpdateTime ().Returns (1.0f);
+
+			var replayPlayer = new MyReplayPlayer (gameReplay);
+
+			replayPlayer.Play ();
+			replayPlayer.Update (1.0f);
+
+			gameReplay.ClearReceivedCalls ();
+
+			replayPlayer.Seek (0.25f);
+
+			gameReplay.Received ().Reset ();
+
+			Assert.That (replayPlayer.State, Is.EqualTo (ReplayPlayerControlsState.Seeking));
+			Assert.That (replayPlayer.GetPlaybackTime(), Is.EqualTo (0.0f));
 		}
 
 		// TODO: seek should be an internal state to execute until seek point reached...
