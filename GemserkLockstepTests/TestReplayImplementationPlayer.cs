@@ -37,11 +37,16 @@ namespace Gemserk.Lockstep.Tests
 		void Update(float dt);
 	}
 
+	// TODO: separate playback timeline from replay commands and stuff logic
+
 	public class MyReplayPlayer : IReplayPlayer
 	{
 		Replay _replay;
 		GameStateLoader _gameStateLoader;
 		GameUpdater _gameUpdater;
+
+		bool _paused;
+		float _playbackSpeed;
 
 		public MyReplayPlayer(Replay replay, GameStateLoader gameStateLoader, GameUpdater gameUpdater)
 		{
@@ -51,34 +56,43 @@ namespace Gemserk.Lockstep.Tests
 		}
 
 		#region IReplayPlayer implementation
+
 		public bool IsPaused ()
 		{
-			return true;
+			return _paused;
 		}
+
 		public float GetPlaybackSpeed ()
 		{
-			throw new System.NotImplementedException ();
+			return _playbackSpeed;
 		}
+
 		public void Play (float speed)
 		{
-			throw new System.NotImplementedException ();
+			_playbackSpeed = speed;
+			_paused = false;	
 		}
+
 		public void Pause ()
 		{
-			
+			_paused = true;
 		}
+
 		public void Seek (float time)
 		{
 			throw new System.NotImplementedException ();
 		}
+
 		public float GetPlaybackTime ()
 		{
 			throw new System.NotImplementedException ();
 		}
+
 		public float GetTotalTime ()
 		{
 			throw new System.NotImplementedException ();
 		}
+
 		public void Restart ()
 		{
 			_gameStateLoader.Load (_replay.GetInitialGameState ());
@@ -112,6 +126,28 @@ namespace Gemserk.Lockstep.Tests
 			replayPlayer.Restart ();
 
 			gameStateLoader.Received ().Load (customGameState);
+		}
+
+		[Test]
+		public void TestReplayPlayerBasicAPI()
+		{
+			var replay = NSubstitute.Substitute.For<Replay> ();
+
+			var gameStateLoader = NSubstitute.Substitute.For<GameStateLoader> ();
+			var gameUpdater = NSubstitute.Substitute.For<GameUpdater> ();
+
+			var replayPlayer = new MyReplayPlayer (replay, gameStateLoader, gameUpdater);
+
+			replayPlayer.Pause ();
+			Assert.That (replayPlayer.IsPaused (), Is.True);
+
+			replayPlayer.Play(1.0f);
+			Assert.That (replayPlayer.IsPaused (), Is.False);
+
+			Assert.That (replayPlayer.GetPlaybackSpeed (), Is.EqualTo (1.0f));
+
+			replayPlayer.Play(2.0f);
+			Assert.That (replayPlayer.GetPlaybackSpeed (), Is.EqualTo (2.0f));
 		}
 
 		[Test]
