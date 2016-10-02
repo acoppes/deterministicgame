@@ -6,11 +6,19 @@ using System.Collections.Generic;
 
 namespace Gemserk.Lockstep.Tests
 {
+	public enum ReplayPlayerControlsState {
+		Paused,
+		Playing, 
+		Seeking
+	}
+
 	public interface ReplayPlayerControls
 	{
-		bool IsPaused();
+		ReplayPlayerControlsState State { get; }
 
 		float PlaybackSpeed { get; set; }
+
+		bool IsPaused();
 
 		void Play();
 
@@ -54,9 +62,12 @@ namespace Gemserk.Lockstep.Tests
 	{
 		GameReplayPlayer _gameReplayPlayer;
 
-		bool _paused;
+		ReplayPlayerControlsState _state;
+
 		float _playbackSpeed;
 		float _playbackTime;
+
+		float _seekTime;
 
 		bool _init;
 
@@ -69,9 +80,10 @@ namespace Gemserk.Lockstep.Tests
 
 		#region IReplayPlayer implementation
 
-		public bool IsPaused ()
-		{
-			return _paused;
+		public ReplayPlayerControlsState State { 
+			get { 
+				return _state;	
+			}
 		}
 
 		public float PlaybackSpeed
@@ -84,23 +96,29 @@ namespace Gemserk.Lockstep.Tests
 			}
 		}
 
+		public bool IsPaused()
+		{
+			return _state == ReplayPlayerControlsState.Paused;
+		}
+
 		public void Play ()
 		{
 			if (!_init) {
 				_gameReplayPlayer.Reset ();
 				_init = true;
 			}
-			_paused = false;	
+			_state = ReplayPlayerControlsState.Playing;
 		}
 
 		public void Pause ()
 		{
-			_paused = true;
+			_state = ReplayPlayerControlsState.Paused;
 		}
 
-		public void Seek (float time)
+		public void Seek (float seekTime)
 		{
-			throw new System.NotImplementedException ();
+			_state = ReplayPlayerControlsState.Seeking;
+			_seekTime = seekTime;
 		}
 
 		public float GetPlaybackTime ()
@@ -115,17 +133,27 @@ namespace Gemserk.Lockstep.Tests
 
 		public void Update (float dt)
 		{
-			if (_paused)
+			if (IsPaused())
 				return;
-
+			
 			float maxDt = _gameReplayPlayer.GetMaxAllowedUpdateTime ();
 
-			if (dt > maxDt)
+			if (_state == ReplayPlayerControlsState.Playing) {
+				if (dt > maxDt)
+					dt = maxDt;
+			} else if (_state == ReplayPlayerControlsState.Seeking) {
 				dt = maxDt;
+
+				if (_playbackTime + dt > _seekTime) {
+					dt = _seekTime - _playbackTime;
+					_state = ReplayPlayerControlsState.Playing;
+				}
+			}
 
 			_playbackTime += dt;
 
 			_gameReplayPlayer.Update (dt);
+
 		}
 		#endregion
 		
@@ -220,18 +248,31 @@ namespace Gemserk.Lockstep.Tests
 		}
 
 		[Test]
-		public void TestSeekShouldRestartIfBeforeCurrentTime()
+		public void TestSeekShouldUpdateAtMaxSpeedUntilSeekFinished()
 		{
 			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
+			gameReplay.GetMaxAllowedUpdateTime ().Returns (1.0f);
 
 			var replayPlayer = new MyReplayPlayer (gameReplay);
 
 			replayPlayer.Play ();
-
-
 		
+			replayPlayer.Seek (1.8f);
 
+			Assert.That (replayPlayer.State, Is.EqualTo (ReplayPlayerControlsState.Seeking));
+
+			replayPlayer.Update (0.1f);
+
+			Assert.That (replayPlayer.GetPlaybackTime(), Is.EqualTo (1.0f));
+
+			replayPlayer.Update (0.1f);
+
+			Assert.That (replayPlayer.GetPlaybackTime(), Is.EqualTo (1.8f));
+
+			Assert.That (replayPlayer.State, Is.Not.EqualTo (ReplayPlayerControlsState.Seeking));
 		}
+
+		// TODO: seek should be an internal state to execute until seek point reached...
 
 		// TEST: speed up playback time...
 
