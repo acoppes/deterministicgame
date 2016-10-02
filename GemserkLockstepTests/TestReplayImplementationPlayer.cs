@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Gemserk.Lockstep.Tests
 {
-	public interface IReplayPlayer
+	public interface ReplayPlayerControls
 	{
 		bool IsPaused();
 
@@ -39,7 +39,7 @@ namespace Gemserk.Lockstep.Tests
 
 	// TODO: separate playback timeline from replay commands and stuff logic
 
-	public class MyReplayPlayer : IReplayPlayer
+	public class MyReplayPlayer : ReplayPlayerControls
 	{
 		Replay _replay;
 		GameStateLoader _gameStateLoader;
@@ -47,6 +47,7 @@ namespace Gemserk.Lockstep.Tests
 
 		bool _paused;
 		float _playbackSpeed;
+		float _playbackTime;
 
 		public MyReplayPlayer(Replay replay, GameStateLoader gameStateLoader, GameUpdater gameUpdater)
 		{
@@ -85,7 +86,7 @@ namespace Gemserk.Lockstep.Tests
 
 		public float GetPlaybackTime ()
 		{
-			throw new System.NotImplementedException ();
+			return _playbackTime;
 		}
 
 		public float GetTotalTime ()
@@ -100,7 +101,9 @@ namespace Gemserk.Lockstep.Tests
 
 		public void Update (float dt)
 		{
-			
+			if (_paused)
+				return;
+			_playbackTime += dt;
 		}
 		#endregion
 		
@@ -151,6 +154,30 @@ namespace Gemserk.Lockstep.Tests
 		}
 
 		[Test]
+		public void TestGetPlaybackTimeWhenUpdateCalledAndNotPaused()
+		{
+			var replay = NSubstitute.Substitute.For<Replay> ();
+
+			var gameStateLoader = NSubstitute.Substitute.For<GameStateLoader> ();
+			var gameUpdater = NSubstitute.Substitute.For<GameUpdater> ();
+
+			var replayPlayer = new MyReplayPlayer (replay, gameStateLoader, gameUpdater);
+
+			replayPlayer.Play(1.0f);
+
+			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (0.0f));
+
+			replayPlayer.Update (5.0f);
+
+			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (5.0f));
+
+			replayPlayer.Update (1.0f);
+
+			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (6.0f));
+		}
+
+
+		[Test]
 		public void TestReplayDontUpdateGameIfPaused()
 		{
 			var replay = NSubstitute.Substitute.For<Replay> ();
@@ -164,6 +191,8 @@ namespace Gemserk.Lockstep.Tests
 			Assert.That (replayPlayer.IsPaused (), Is.True);
 
 			replayPlayer.Update (1.0f);
+
+			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (0.0f));
 
 			gameUpdater.DidNotReceiveWithAnyArgs ().Update (Arg.Any<float> ());
 		}
