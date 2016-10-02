@@ -139,7 +139,7 @@ namespace Gemserk.Lockstep.Tests
 
 				if (_playbackTime + dt > _seekTime) {
 					dt = _seekTime - _playbackTime;
-					_state = ReplayPlayerControlsState.Playing;
+					_state = ReplayPlayerControlsState.Paused;
 				}
 			}
 
@@ -269,7 +269,7 @@ namespace Gemserk.Lockstep.Tests
 
 			Assert.That (replayPlayer.GetPlaybackTime(), Is.EqualTo (1.8f));
 
-			Assert.That (replayPlayer.State, Is.Not.EqualTo (ReplayPlayerControlsState.Seeking));
+			Assert.That (replayPlayer.State, Is.EqualTo (ReplayPlayerControlsState.Paused));
 		}
 
 		[Test]
