@@ -1,4 +1,4 @@
-namespace Gemserk.Lockstep 
+namespace Gemserk.Lockstep.Replays 
 {		
 	public class ReplayController : GameLogic
 	{

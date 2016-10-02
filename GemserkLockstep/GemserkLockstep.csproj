@@ -72,6 +72,7 @@
     <Compile Include="GameLogic\Replay\ReplayView.cs" />
     <Compile Include="GameLogic\GameState\GameStateCollaborator.cs" />
     <Compile Include="GameLogic\GameState\GameStateString.cs" />
+    <Compile Include="GameLogic\Replay\ReplayPlayerControls.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

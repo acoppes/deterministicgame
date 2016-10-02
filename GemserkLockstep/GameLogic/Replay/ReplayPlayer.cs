@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Gemserk.Lockstep 
+namespace Gemserk.Lockstep.Replays 
 {		
 	public class ReplayPlayer
 	{

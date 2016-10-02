@@ -1,14 +1,11 @@
 using NUnit.Framework;
 using NSubstitute;
-using Gemserk.Lockstep;
+using Gemserk.Lockstep.Replays;
 using NSubstitute.ReturnsExtensions;
 using System.Collections.Generic;
 
 namespace Gemserk.Lockstep.Tests
 {
-
-
-
 	public class TestReplayPlayer
 	{
 		[Test]

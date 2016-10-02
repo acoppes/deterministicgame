@@ -1,13 +1,7 @@
 using System.Collections.Generic;
 
-namespace Gemserk.Lockstep 
+namespace Gemserk.Lockstep.Replays
 {
-//	public struct ReplayGameState
-//	{
-//		public float fixedDeltaTime;
-//		public int updatesPerLockstep;
-//	}
-
 	public interface Replay
 	{
 		// For replay playback
@@ -30,4 +24,5 @@ namespace Gemserk.Lockstep
 
 		void SaveInitialGameState(GameState gameState);
 	}
+
 }
