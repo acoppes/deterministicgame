@@ -10,9 +10,9 @@ namespace Gemserk.Lockstep.Tests
 	{
 		bool IsPaused();
 
-		float GetPlaybackSpeed();
+		float PlaybackSpeed { get; set; }
 
-		void Play(float speed);
+		void Play();
 
 		void Pause();
 
@@ -21,8 +21,6 @@ namespace Gemserk.Lockstep.Tests
 		float GetPlaybackTime();
 
 		float GetTotalTime();
-
-		void Restart();
 
 		void Update (float dt);
 	}
@@ -34,6 +32,19 @@ namespace Gemserk.Lockstep.Tests
 
 	public interface GameUpdater
 	{
+		// max allowed time to avoid spiral of death?
+
+		// float GetMaxUpdateTime(float dt);
+
+		void Update(float dt);
+	}
+
+	public interface GameReplayPlayer
+	{
+		void Reset();
+
+		float GetMaxAllowedUpdateTime();
+
 		void Update(float dt);
 	}
 
@@ -41,19 +52,19 @@ namespace Gemserk.Lockstep.Tests
 
 	public class MyReplayPlayer : ReplayPlayerControls
 	{
-		Replay _replay;
-		GameStateLoader _gameStateLoader;
-		GameUpdater _gameUpdater;
+		GameReplayPlayer _gameReplayPlayer;
 
 		bool _paused;
 		float _playbackSpeed;
 		float _playbackTime;
 
-		public MyReplayPlayer(Replay replay, GameStateLoader gameStateLoader, GameUpdater gameUpdater)
+		bool _init;
+
+		public MyReplayPlayer(GameReplayPlayer gameReplayPlayer)
 		{
-			_replay = replay;
-			_gameStateLoader = gameStateLoader;
-			_gameUpdater = gameUpdater;
+			_gameReplayPlayer = gameReplayPlayer;
+			_playbackSpeed = 1.0f;
+			_init = false;
 		}
 
 		#region IReplayPlayer implementation
@@ -63,14 +74,22 @@ namespace Gemserk.Lockstep.Tests
 			return _paused;
 		}
 
-		public float GetPlaybackSpeed ()
+		public float PlaybackSpeed
 		{
-			return _playbackSpeed;
+			get {
+				return _playbackSpeed;
+			}
+			set { 
+				_playbackSpeed = value;
+			}
 		}
 
-		public void Play (float speed)
+		public void Play ()
 		{
-			_playbackSpeed = speed;
+			if (!_init) {
+				_gameReplayPlayer.Reset ();
+				_init = true;
+			}
 			_paused = false;	
 		}
 
@@ -94,16 +113,19 @@ namespace Gemserk.Lockstep.Tests
 			throw new System.NotImplementedException ();
 		}
 
-		public void Restart ()
-		{
-			_gameStateLoader.Load (_replay.GetInitialGameState ());
-		}
-
 		public void Update (float dt)
 		{
 			if (_paused)
 				return;
+
+			float maxDt = _gameReplayPlayer.GetMaxAllowedUpdateTime ();
+
+			if (dt > maxDt)
+				dt = maxDt;
+
 			_playbackTime += dt;
+
+			_gameReplayPlayer.Update (dt);
 		}
 		#endregion
 		
@@ -113,80 +135,80 @@ namespace Gemserk.Lockstep.Tests
 	{
 
 		[Test]
-		public void TestRestartShouldLoadInitialGameStateFromReplay()
+		public void TestPlayResetsGameToInitialState()
 		{
-			var replay = NSubstitute.Substitute.For<Replay> ();
-			// var gameStateProvider = NSubstitute.Substitute.For<GameStateProvider> ();
-			var gameStateLoader = NSubstitute.Substitute.For<GameStateLoader> ();
-			var gameUpdater = NSubstitute.Substitute.For<GameUpdater> ();
+			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
 
-			GameState customGameState = NSubstitute.Substitute.For<GameState> ();
+			var replayPlayer = new MyReplayPlayer (gameReplay);
 
-			replay.GetInitialGameState ().Returns (customGameState);
+			replayPlayer.Play();
 
-			var replayPlayer = new MyReplayPlayer (replay, gameStateLoader, gameUpdater);
+			gameReplay.Received ().Reset ();
+		}
 
-			replayPlayer.Restart ();
+		[Test]
+		public void TestPlayShouldntResetGameTwice()
+		{
+			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
 
-			gameStateLoader.Received ().Load (customGameState);
+			var replayPlayer = new MyReplayPlayer (gameReplay);
+
+			replayPlayer.Play();
+
+			gameReplay.ClearReceivedCalls ();
+
+			replayPlayer.Play();
+
+			gameReplay.DidNotReceive ().Reset ();
 		}
 
 		[Test]
 		public void TestReplayPlayerBasicAPI()
 		{
-			var replay = NSubstitute.Substitute.For<Replay> ();
+			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
 
-			var gameStateLoader = NSubstitute.Substitute.For<GameStateLoader> ();
-			var gameUpdater = NSubstitute.Substitute.For<GameUpdater> ();
-
-			var replayPlayer = new MyReplayPlayer (replay, gameStateLoader, gameUpdater);
-
+			var replayPlayer = new MyReplayPlayer (gameReplay);
 			replayPlayer.Pause ();
 			Assert.That (replayPlayer.IsPaused (), Is.True);
 
-			replayPlayer.Play(1.0f);
+			replayPlayer.Play();
 			Assert.That (replayPlayer.IsPaused (), Is.False);
 
-			Assert.That (replayPlayer.GetPlaybackSpeed (), Is.EqualTo (1.0f));
-
-			replayPlayer.Play(2.0f);
-			Assert.That (replayPlayer.GetPlaybackSpeed (), Is.EqualTo (2.0f));
+			replayPlayer.PlaybackSpeed = 2.0f;
+			Assert.That (replayPlayer.PlaybackSpeed, Is.EqualTo (2.0f));
 		}
 
 		[Test]
 		public void TestGetPlaybackTimeWhenUpdateCalledAndNotPaused()
 		{
-			var replay = NSubstitute.Substitute.For<Replay> ();
+			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
 
-			var gameStateLoader = NSubstitute.Substitute.For<GameStateLoader> ();
-			var gameUpdater = NSubstitute.Substitute.For<GameUpdater> ();
+			gameReplay.GetMaxAllowedUpdateTime ().Returns (1.0f);
 
-			var replayPlayer = new MyReplayPlayer (replay, gameStateLoader, gameUpdater);
-
-			replayPlayer.Play(1.0f);
+			var replayPlayer = new MyReplayPlayer (gameReplay);
+			replayPlayer.Play();
 
 			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (0.0f));
-
+	
+			// cant receive bigger update than max allowed time...
 			replayPlayer.Update (5.0f);
+	
+			gameReplay.Received ().GetMaxAllowedUpdateTime ();
+			gameReplay.Received().Update (1.0f);
 
-			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (5.0f));
+			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (1.0f));
 
 			replayPlayer.Update (1.0f);
 
-			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (6.0f));
+			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (2.0f));
 		}
-
-
+			
 		[Test]
 		public void TestReplayDontUpdateGameIfPaused()
 		{
-			var replay = NSubstitute.Substitute.For<Replay> ();
-			// var gameStateProvider = NSubstitute.Substitute.For<GameStateProvider> ();
-			var gameStateLoader = NSubstitute.Substitute.For<GameStateLoader> ();
-			var gameUpdater = NSubstitute.Substitute.For<GameUpdater> ();
+			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
 
-			var replayPlayer = new MyReplayPlayer (replay, gameStateLoader, gameUpdater);
-
+			var replayPlayer = new MyReplayPlayer (gameReplay);
 			replayPlayer.Pause ();
 			Assert.That (replayPlayer.IsPaused (), Is.True);
 
@@ -194,8 +216,26 @@ namespace Gemserk.Lockstep.Tests
 
 			Assert.That (replayPlayer.GetPlaybackTime (), Is.EqualTo (0.0f));
 
-			gameUpdater.DidNotReceiveWithAnyArgs ().Update (Arg.Any<float> ());
+			gameReplay.DidNotReceiveWithAnyArgs ().Update (Arg.Any<float> ());
 		}
+
+		[Test]
+		public void TestSeekShouldRestartIfBeforeCurrentTime()
+		{
+			var gameReplay = NSubstitute.Substitute.For<GameReplayPlayer> ();
+
+			var replayPlayer = new MyReplayPlayer (gameReplay);
+
+			replayPlayer.Play ();
+
+
+		
+
+		}
+
+		// TEST: speed up playback time...
+
+		// TEST: dont update over total time
 	}
 	
 }
