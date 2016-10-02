@@ -47,6 +47,8 @@ public class ReplayControlsUI : MonoBehaviour {
 	public Button playButton;
 	public Button pauseButton;
 
+	public Button[] speedButtons;
+
 	public Slider seekSlider;
 
 	bool draggingSlider = false;
@@ -85,6 +87,18 @@ public class ReplayControlsUI : MonoBehaviour {
 		AddEventTrigger (seekSlider.GetComponentInChildren<EventTrigger> (), EventTriggerType.BeginDrag, delegate(BaseEventData eventData) {
 			draggingSlider = true;
 		});
+
+		float speed = 1.0f;
+
+		for (int i = 0; i < speedButtons.Length; i++) {
+			float newSpeed = speed;
+
+			speedButtons [i].onClick.AddListener (delegate {
+				replayControls.PlaybackSpeed = newSpeed;
+			});
+
+			speed *= 2.0f;
+		}
 	}
 	
 	// Update is called once per frame
