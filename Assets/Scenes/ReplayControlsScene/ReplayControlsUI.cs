@@ -2,6 +2,8 @@
 using Gemserk.Lockstep.Replays;
 using System;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 [Serializable]
 public class MyGameReplayPlayer : GameReplayPlayer
@@ -47,6 +49,19 @@ public class ReplayControlsUI : MonoBehaviour {
 
 	public Slider seekSlider;
 
+	bool draggingSlider = false;
+
+	void AddEventTrigger(EventTrigger eventTrigger, EventTriggerType triggerType, UnityAction<BaseEventData> listener)
+	{
+		var seekSliderOnEndDragTrigger = new EventTrigger.Entry () {
+			eventID = triggerType
+		};
+
+		seekSliderOnEndDragTrigger.callback.AddListener (listener);
+
+		eventTrigger.triggers.Add (seekSliderOnEndDragTrigger);
+	}
+
 	// Use this for initialization
 	void Start () {
 		replayControls = new ReplayPlayerControlsImplementation (myReplayPlayerMock);
@@ -62,8 +77,13 @@ public class ReplayControlsUI : MonoBehaviour {
 			replayControls.Pause();	
 		});
 
-		seekSlider.onValueChanged.AddListener (delegate(float t) {
-			replayControls.Seek(t);
+		AddEventTrigger (seekSlider.GetComponentInChildren<EventTrigger> (), EventTriggerType.EndDrag, delegate(BaseEventData eventData) {
+			replayControls.Seek(seekSlider.value);
+			draggingSlider = false;
+		});
+
+		AddEventTrigger (seekSlider.GetComponentInChildren<EventTrigger> (), EventTriggerType.BeginDrag, delegate(BaseEventData eventData) {
+			draggingSlider = true;
 		});
 	}
 	
@@ -94,6 +114,10 @@ public class ReplayControlsUI : MonoBehaviour {
 
 		playButton.interactable = replayControls.State != ReplayPlayerControlsState.Playing;
 		pauseButton.interactable = replayControls.State != ReplayPlayerControlsState.Paused;
+
+		if (replayControls.State != ReplayPlayerControlsState.Seeking && !draggingSlider) {
+			seekSlider.value = replayControls.GetPlaybackTime ();
+		}
 	}
 		
 }
