@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Gemserk.Lockstep.Replays;
 using Gemserk.Lockstep;
 
 public class MyCustomReplay : ReplayBase

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Gemserk.Lockstep;
+using Gemserk.Lockstep.Replays;
 
 public class RecorderViewCanvas : MonoBehaviour, ReplayView {
 
