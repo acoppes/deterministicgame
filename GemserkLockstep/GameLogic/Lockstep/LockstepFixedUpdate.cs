@@ -88,7 +88,7 @@ namespace Gemserk.Lockstep
 
 		public int GetFirstLockstepFrame()
 		{
-			return GameFramesPerLockstep;
+			return GameFramesPerLockstep - 1;
 		}
 
 		public int GetNextLockstepFrame ()
@@ -99,7 +99,7 @@ namespace Gemserk.Lockstep
 		public int GetNextLockstepFrame(int currentFrame)
 		{
 			int d = (currentFrame / GameFramesPerLockstep) + 2;
-			return GameFramesPerLockstep * d;
+			return (GameFramesPerLockstep * d) - 1;
 		}
 
 		public bool IsLastFrameForNextLockstep(int frame)

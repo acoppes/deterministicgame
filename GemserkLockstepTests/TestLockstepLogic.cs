@@ -38,7 +38,7 @@ public class TestLockstepLogic {
 	}
 
 	[Test]
-	public void TestNextLockstepFrame(){
+	public void TestNextLockstepFrameIsZeroIndexed(){
 
 		//		var gameLogic = NSubstitute.Substitute.For<DeterministicGameLogic> ();
 
@@ -50,17 +50,25 @@ public class TestLockstepLogic {
 		lockstepGameLogic.GameFramesPerLockstep = 4;
 		lockstepGameLogic.FixedStepTime = 0.1f;
 
+		// 0, 1, 2, 3
+		// 4, 5, 6, 7
+		// 8, 9, 10, 11
+
 //		lockstepGameLogic.SetGameLogic (gameLogic);
 
 //		lockstepLogic.IsReady (0).Returns (true);
 
-		Assert.That (lockstepGameLogic.GetNextLockstepFrame (0), Is.EqualTo (8));
-		Assert.That (lockstepGameLogic.GetNextLockstepFrame (1), Is.EqualTo (8));
-		Assert.That (lockstepGameLogic.GetNextLockstepFrame (2), Is.EqualTo (8));
-		Assert.That (lockstepGameLogic.GetNextLockstepFrame (4), Is.EqualTo (12));
-		Assert.That (lockstepGameLogic.GetNextLockstepFrame (5), Is.EqualTo (12));
-		Assert.That (lockstepGameLogic.GetNextLockstepFrame (6), Is.EqualTo (12));
-		Assert.That (lockstepGameLogic.GetNextLockstepFrame (8), Is.EqualTo (16));
+		Assert.That (lockstepGameLogic.GetFirstLockstepFrame (), Is.EqualTo (3));
+
+		Assert.That (lockstepGameLogic.GetNextLockstepFrame (0), Is.EqualTo (7));
+		Assert.That (lockstepGameLogic.GetNextLockstepFrame (1), Is.EqualTo (7));
+		Assert.That (lockstepGameLogic.GetNextLockstepFrame (2), Is.EqualTo (7));
+
+		Assert.That (lockstepGameLogic.GetNextLockstepFrame (4), Is.EqualTo (11));
+		Assert.That (lockstepGameLogic.GetNextLockstepFrame (5), Is.EqualTo (11));
+		Assert.That (lockstepGameLogic.GetNextLockstepFrame (6), Is.EqualTo (11));
+
+//		Assert.That (lockstepGameLogic.GetNextLockstepFrame (8), Is.EqualTo (16));
 	}
 
 	[Test]
@@ -203,7 +211,27 @@ public class TestLockstepLogic {
 		lockstepLogic.Received (1).Process(Arg.Is<int>(5));
 	}
 
+	[Test]
+	public void TestLastUpdatedFrameShouldBePreviousToLockstep(){
 
+		var gameLogic = new TestGameStep.GameStepEngineMock ();
+
+		var lockstepLogic = NSubstitute.Substitute.For<LockstepLogic> ();
+
+		LockstepFixedUpdate lockstepGameLogic = new LockstepFixedUpdate (lockstepLogic);
+
+		lockstepGameLogic.SetGameLogic (gameLogic);
+
+		lockstepGameLogic.FixedStepTime = 0.1f;
+		lockstepGameLogic.MaxAllowedFrameTime = 1.0f;
+		lockstepGameLogic.GameFramesPerLockstep = 4;
+
+		lockstepLogic.IsReady (Arg.Any<int> ()).ReturnsForAnyArgs(false);
+
+		lockstepGameLogic.Update (0.8f);
+
+		Assert.That (gameLogic.lastFrame, Is.EqualTo (lockstepGameLogic.GetFirstLockstepFrame() - 1));
+	}
 		
 }
 
