@@ -207,8 +207,10 @@ public class TestLockstepLogic {
 
 		lockstepGameLogic.Update (0.5f);
 
-		lockstepLogic.Received (1).IsReady(Arg.Is<int>(5));
-		lockstepLogic.Received (1).Process(Arg.Is<int>(5));
+		// changed to 4 now that frame is zero indexed 
+
+		lockstepLogic.Received (1).IsReady(Arg.Is<int>(4));
+		lockstepLogic.Received (1).Process(Arg.Is<int>(4));
 	}
 
 	[Test]
